@@ -908,7 +908,7 @@ function saveGas(){
   var url=document.getElementById('inp-url').value.trim();
   if(!url){alert('Вставь URL!');return;}
   if(!url.startsWith('https://script.google.com')){alert('URL должен начинаться с https://script.google.com');return;}
-  gasUrl=url; localStorage.setItem('de-gas-url',gasUrl); closeModal(); updateSyncUI(); doSync();
+  gasUrl=url; localStorage.setItem("de-gas-url",gasUrl); closeModal(); updateSyncUI(); if(Object.keys(ST).length>0) doSync();
 }
 function disconnectGas(){
   if(!confirm('Отключить синхронизацию?')) return;
