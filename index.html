@@ -260,6 +260,38 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
 
     <button class="btn btn-red" onclick="startQuiz()" id="start-btn">Начать</button>
     <button class="btn btn-ghost" onclick="showStats()">📊 Статистика ошибок</button>
+    <button class="btn btn-ghost" onclick="showAddWords()">✏️ Мои слова</button>
+  </div>
+</div>
+
+<!-- ===== ADD WORDS ===-->
+<div id="add-words" class="screen">
+  <div class="shdr">
+    <button class="back-btn" onclick="goHome()">← Назад</button>
+    <div class="shdr-title">Мои слова</div>
+    <button class="back-btn" onclick="showAddForm()" style="color:var(--grn);border-color:rgba(94,232,160,.3)">+ Добавить</button>
+  </div>
+  <div class="sbody">
+    <div class="modal-sub" style="margin-bottom:20px">Слова добавляются в главу <strong>«Meine Wörter»</strong> и доступны для изучения сразу.</div>
+    <div id="my-words-list"></div>
+  </div>
+</div>
+
+<!-- ===== ADD WORD FORM ===-->
+<div id="add-word-form" class="screen">
+  <div class="shdr">
+    <button class="back-btn" onclick="showAddWords()">← Назад</button>
+    <div class="shdr-title">Новое слово</div>
+  </div>
+  <div class="sbody">
+    <label class="ilbl">Немецкое слово</label>
+    <input class="ifield" id="new-de" placeholder="z.B. der Hund" style="margin-bottom:12px">
+    <label class="ilbl">Перевод на русский</label>
+    <input class="ifield" id="new-ru" placeholder="z.B. собака" style="margin-bottom:12px">
+    <label class="ilbl">Подсказка (необязательно)</label>
+    <input class="ifield" id="new-hint" placeholder="z.B. сущ., м.р., -e" style="margin-bottom:20px">
+    <button class="btn btn-red" onclick="saveNewWord()">Сохранить слово</button>
+    <div id="add-word-error" style="color:var(--acc);font-size:13px;margin-top:10px;display:none"></div>
   </div>
 </div>
 
@@ -791,13 +823,26 @@ const CHAPTERS = [
 ];
 
 // ==================== BUILD FLAT INDEX ====================
-// Each word gets a global index: { chapterIdx, wordIdx }
+var MY_CHAPTER_NUM = 99;
+var MY_CHAPTER_NAME = 'Meine Wörter';
+var MY_WORDS = JSON.parse(localStorage.getItem('de-mywords')||'[]');
+
 var WORDS = []; // flat array {de,ru,h,chNum,chName,globalIdx}
 CHAPTERS.forEach(function(ch,ci){
   ch.words.forEach(function(w,wi){
     WORDS.push({de:w.de,ru:w.ru,h:w.h,chNum:ch.num,chName:ch.name,globalIdx:WORDS.length});
   });
 });
+
+function rebuildMyWords(){
+  // Remove old custom words
+  WORDS = WORDS.filter(function(w){ return w.chNum !== MY_CHAPTER_NUM; });
+  // Add current custom words
+  MY_WORDS.forEach(function(w){
+    WORDS.push({de:w.de,ru:w.ru,h:w.h||'',chNum:MY_CHAPTER_NUM,chName:MY_CHAPTER_NAME,globalIdx:WORDS.length});
+  });
+}
+rebuildMyWords();
 
 // ==================== STATE ====================
 var selChapter = 0; // 0 = all, else chapter num
@@ -928,8 +973,9 @@ function doSync(){
   var rows = WORDS.map(function(w){
     var ws=ST[w.globalIdx]||{};
     function g(m,f){ return (ws[m]&&ws[m][f])||0; }
+    var ta=['mc-de','mc-ru','audio','letter'].reduce(function(s,m){ return s+g(m,'a'); },0);
     var te=['mc-de','mc-ru','audio','letter'].reduce(function(s,m){ return s+g(m,'e'); },0);
-    return [w.chNum, w.de, w.ru, g('mc-de','a'),g('mc-de','e'), g('mc-ru','a'),g('mc-ru','e'), g('audio','a'),g('audio','e'), g('letter','a'),g('letter','e'), te, new Date().toLocaleString('ru')];
+    return [w.chNum, w.de, w.ru, ta, te, g('mc-de','a'),g('mc-de','e'), g('mc-ru','a'),g('mc-ru','e'), g('audio','a'),g('audio','e'), g('letter','a'),g('letter','e')];
   });
   fetch(gasUrl,{method:'POST',body:JSON.stringify({rows:rows})})
     .then(function(r){ return r.json(); })
@@ -1210,6 +1256,59 @@ function renderWList(f){
     list.appendChild(row);
   });
   if(!list.innerHTML) list.innerHTML='<div style="color:#44445a;text-align:center;padding:28px;font-size:13px">Нет данных</div>';
+}
+
+// ==================== MY WORDS ====================
+function showAddWords(){
+  renderMyWordsList();
+  showScreen('add-words');
+}
+
+function renderMyWordsList(){
+  var list = document.getElementById('my-words-list');
+  if(!MY_WORDS.length){
+    list.innerHTML='<div style="color:#44445a;text-align:center;padding:40px;font-size:14px">Пока нет слов.<br>Нажми + Добавить</div>';
+    return;
+  }
+  list.innerHTML='';
+  MY_WORDS.forEach(function(w,i){
+    var row=document.createElement('div');
+    row.className='wrow';
+    row.style.marginBottom='6px';
+    row.innerHTML='<div style="flex:1"><div class="wde">'+w.de+'</div><div class="wru">'+w.ru+(w.h?'<span style="color:#44445a;font-size:10px;margin-left:6px">'+w.h+'</span>':'')+'</div></div>'+
+      '<button onclick="deleteMyWord('+i+')" style="background:none;border:none;color:#44445a;cursor:pointer;font-size:16px;padding:4px 8px">✕</button>';
+    list.appendChild(row);
+  });
+}
+
+function showAddForm(){
+  document.getElementById('new-de').value='';
+  document.getElementById('new-ru').value='';
+  document.getElementById('new-hint').value='';
+  document.getElementById('add-word-error').style.display='none';
+  showScreen('add-word-form');
+}
+
+function saveNewWord(){
+  var de=document.getElementById('new-de').value.trim();
+  var ru=document.getElementById('new-ru').value.trim();
+  var h=document.getElementById('new-hint').value.trim();
+  var err=document.getElementById('add-word-error');
+  if(!de||!ru){ err.textContent='Заполни оба поля!'; err.style.display='block'; return; }
+  MY_WORDS.push({de:de,ru:ru,h:h});
+  localStorage.setItem('de-mywords',JSON.stringify(MY_WORDS));
+  rebuildMyWords();
+  buildChapterGrid();
+  showAddWords();
+}
+
+function deleteMyWord(idx){
+  if(!confirm('Удалить слово «'+MY_WORDS[idx].de+'»?')) return;
+  MY_WORDS.splice(idx,1);
+  localStorage.setItem('de-mywords',JSON.stringify(MY_WORDS));
+  rebuildMyWords();
+  buildChapterGrid();
+  renderMyWordsList();
 }
 
 // ==================== INIT ====================
