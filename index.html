@@ -8,7 +8,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;-webkit-text-size-adjust:100%}
-:root{--bg:#0a0a0f;--s1:#111118;--s2:#18181f;--s3:#22222c;--brd:#2e2e3e;--acc:#e83a4e;--acc2:#f5a623;--acc3:#4fc3f7;--grn:#5ee8a0;--text:#e8e8f0;--muted:#6868888}
+:root{--bg:#0a0a0f;--s1:#111118;--s2:#18181f;--s3:#22222c;--brd:#2e2e3e;--acc:#e83a4e;--acc2:#f5a623;--acc3:#4fc3f7;--grn:#5ee8a0;--text:#e8e8f0;--muted:#686888}
 
 /* SCREENS */
 .screen{display:none;min-height:100vh;flex-direction:column}
@@ -208,14 +208,14 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
     <div class="modal-sub">После настройки статистика будет синхронизироваться после каждого теста. Работает на любом устройстве — достаточно вставить тот же URL.</div>
     <div class="steps">
       <div class="step"><div class="sn">1</div><div class="st">Открой таблицу Google Sheets → меню <strong>Расширения → Apps Script</strong></div></div>
-      <div class="step"><div class="sn">2</div><div class="st">Удали весь код и вставь:<br><br><code>function doPost(e){try{var d=JSON.parse(e.postData.contents);var ss=SpreadsheetApp.getActiveSpreadsheet();var sh=ss.getSheetByName('Statistik')||ss.insertSheet('Statistik');sh.clearContents();sh.appendRow(['Kapitel','Слово','Перевод','🇩🇪попыток','🇩🇪ошибок','🇷🇺попыток','🇷🇺ошибок','🔊попыток','🔊ошибок','🔤попыток','🔤ошибок','Всего ошибок','Обновлено']);d.rows.forEach(function(r){sh.appendRow(r);});return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);}catch(err){return ContentService.createTextOutput(JSON.stringify({ok:false,error:err.message})).setMimeType(ContentService.MimeType.JSON);}}</code></div></div>
+      <div class="step"><div class="sn">2</div><div class="st">Удали весь код и вставь:<br><br><code>function doPost(e){try{var d=JSON.parse(e.postData.contents);var ss=SpreadsheetApp.getActiveSpreadsheet();var sh=ss.getSheetByName('Statistik')||ss.insertSheet('Statistik');sh.clearContents();var h=['Kapitel','Word (DE)','Translation (RU)','Total attempts','Total errors','DE attempts','DE errors','RU attempts','RU errors','Audio attempts','Audio errors','Letters attempts','Letters errors','Updated'];var rows=[h].concat(d.rows);sh.getRange(1,1,rows.length,h.length).setValues(rows);var hr=sh.getRange(1,1,1,h.length);hr.setFontWeight('bold');hr.setBackground('#263238');hr.setFontColor('#ffffff');sh.setFrozenRows(1);for(var i=1;i<=h.length;i++)sh.autoResizeColumn(i);return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);}catch(err){return ContentService.createTextOutput(JSON.stringify({ok:false,error:err.message})).setMimeType(ContentService.MimeType.JSON);}}</code></div></div>
       <div class="step"><div class="sn">3</div><div class="st"><strong>Развернуть → Новое развёртывание</strong> → тип <strong>Веб-приложение</strong> → доступ <strong>Все</strong> → <strong>Развернуть</strong></div></div>
       <div class="step"><div class="sn">4</div><div class="st">Скопируй URL веб-приложения и вставь ниже</div></div>
     </div>
     <label class="ilbl">URL веб-приложения</label>
     <input class="ifield" id="inp-url" placeholder="https://script.google.com/macros/s/...">
     <div class="modal-btns">
-      <button class="btn-ghost modal-btns" onclick="closeModal()" style="flex:0 0 auto;width:auto;padding:13px 16px;border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;background:var(--s2);color:var(--text);border:1px solid var(--brd)">Отмена</button>
+      <button class="btn btn-ghost" onclick="closeModal()" style="flex:0 0 auto;width:auto;padding:13px 16px;border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;background:var(--s2);color:var(--text);border:1px solid var(--brd)">Отмена</button>
       <button class="btn btn-red" onclick="saveGas()" style="flex:1;margin-bottom:0;padding:13px;font-size:14px">Сохранить</button>
     </div>
     <button class="disc-btn" id="disc-btn" onclick="disconnectGas()" style="display:none">Отключить синхронизацию</button>
@@ -849,7 +849,7 @@ var selChapter = 0; // 0 = all, else chapter num
 var selMode = 'mc-de';
 var curMode = 'mc-de', curChNum = 0;
 var qs=[], qi=0, score=0, errs=0, answered=false;
-var t0=null, curW=null, curAns='';
+var t0=null, curW=null, curQMode='', curAns='';
 var placed=[], curStatFilter='all';
 var ST = JSON.parse(localStorage.getItem('de-st2')||'{}');
 var gasUrl = localStorage.getItem('de-gas-url')||'';
@@ -970,12 +970,13 @@ function setSyncState(state,ttl,sub){
 function doSync(){
   if(!gasUrl) return;
   setSyncState('busy','Синхронизация…','Запись данных');
+  var syncTime = new Date().toLocaleString('ru');
   var rows = WORDS.map(function(w){
     var ws=ST[w.globalIdx]||{};
     function g(m,f){ return (ws[m]&&ws[m][f])||0; }
     var ta=['mc-de','mc-ru','audio','letter'].reduce(function(s,m){ return s+g(m,'a'); },0);
     var te=['mc-de','mc-ru','audio','letter'].reduce(function(s,m){ return s+g(m,'e'); },0);
-    return [w.chNum, w.de, w.ru, ta, te, g('mc-de','a'),g('mc-de','e'), g('mc-ru','a'),g('mc-ru','e'), g('audio','a'),g('audio','e'), g('letter','a'),g('letter','e')];
+    return [w.chName, w.de, w.ru, ta, te, g('mc-de','a'),g('mc-de','e'), g('mc-ru','a'),g('mc-ru','e'), g('audio','a'),g('audio','e'), g('letter','a'),g('letter','e'), syncTime];
   });
   fetch(gasUrl,{method:'POST',body:JSON.stringify({rows:rows})})
     .then(function(r){ return r.json(); })
@@ -1052,7 +1053,7 @@ function startQuiz(){
 
 function renderQ(){
   var q=qs[qi], w=q.w;
-  curW=w; answered=false; curAns='';
+  curW=w; curQMode=q.m; answered=false; curAns='';
   document.getElementById('qcur').textContent=qi+1;
   document.getElementById('pfill').style.width=(qi/qs.length*100)+'%';
   document.getElementById('qsc').textContent='✓ '+score;
@@ -1101,7 +1102,7 @@ function renderMC(lang, targetW){
     if(i>=opts.length) return;
     var btn=document.createElement('button'); btn.className='opt';
     btn.innerHTML='<span class="oltr">'+l+'</span><span>'+opts[i]+'</span>';
-    (function(val){ btn.onclick=function(){ pickOpt(btn,val,cv,targetW.globalIdx,curW.m); }; })(opts[i]);
+    (function(val){ btn.onclick=function(){ pickOpt(btn,val,cv,targetW.globalIdx,curQMode); }; })(opts[i]);
     area.appendChild(btn);
   });
 }
@@ -1166,7 +1167,7 @@ function checkLetters(){
   var ok=base(curAns)===base(correct)||curAns.toLowerCase()===correct.toLowerCase();
   document.getElementById('lans').className='lans '+(ok?'correct':'wrong');
   document.getElementById('chkbtn').disabled=true;
-  rec(curW.globalIdx,curW.m,!ok);
+  rec(curW.globalIdx,curQMode,!ok);
   if(ok){ score++; showFB(true,'Правильно! 🎉'); document.querySelectorAll('#lans .ltile').forEach(function(t){ t.classList.remove('placed'); t.classList.add('ok'); }); }
   else { errs++; showFB(false,'Неверно. Правильный ответ: '+correct); document.querySelectorAll('#lans .ltile').forEach(function(t){ t.classList.remove('placed'); t.classList.add('bad'); }); }
   document.getElementById('nxtbtn').classList.add('show');
@@ -1205,7 +1206,6 @@ function showResults(){
   document.getElementById('snote').textContent='💾 Сохранено локально';
   showScreen('results');
   if(gasUrl) doSync();
-  else if(gasUrl==='') document.getElementById('snote').textContent='💾 Сохранено локально';
 }
 
 // ==================== STATS PAGE ====================
