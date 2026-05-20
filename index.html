@@ -2001,6 +2001,34 @@ function buildChapterGrid(){
     card.onclick = (function(chNum){ return function(){ pickChapter(chNum,card); }; })(ch.num);
     grid.appendChild(card);
   });
+
+  // "Meine Wörter" card — only if user has added custom words
+  if(MY_WORDS.length > 0){
+    var myWordsInW = WORDS.filter(function(w){ return w.chNum===MY_CHAPTER_NUM; });
+    var myStudied = myWordsInW.filter(function(w){ return totalAttempts(w.globalIdx)>0; }).length;
+    var myLeft = myWordsInW.length - myStudied;
+    var myPct = myWordsInW.length ? Math.round(myStudied/myWordsInW.length*100) : 0;
+    var r2=16, circ2=2*Math.PI*r2, dash2=circ2*myPct/100;
+    var myMeta = myStudied+'/'+myWordsInW.length+' изучено';
+    if(myLeft>0) myMeta += ' · <span style="color:#5ee8a0;font-weight:600">'+myLeft+' новых</span>';
+    var myCard = document.createElement('div');
+    myCard.className = 'ch-card' + (selChapter===MY_CHAPTER_NUM?' selected':'');
+    myCard.setAttribute('data-ch', MY_CHAPTER_NUM);
+    myCard.innerHTML =
+      '<div class="ch-num" style="font-size:9px">МОИ</div>'+
+      '<div class="ch-info">'+
+        '<div class="ch-name">✏️ Meine Wörter</div>'+
+        '<div class="ch-meta">'+myMeta+'</div>'+
+      '</div>'+
+      '<div class="ch-prog">'+
+        '<svg width="36" height="36" viewBox="0 0 36 36">'+
+          '<circle cx="18" cy="18" r="'+r2+'" fill="none" stroke="#2e2e3e" stroke-width="3"/>'+
+          '<circle cx="18" cy="18" r="'+r2+'" fill="none" stroke="#5ee8a0" stroke-width="3" stroke-dasharray="'+dash2+' '+(circ2-dash2)+'" stroke-linecap="round"/>'+
+        '</svg>'+
+      '</div>';
+    myCard.onclick = (function(){ return function(){ pickChapter(MY_CHAPTER_NUM,myCard); }; })();
+    grid.appendChild(myCard);
+  }
 }
 
 function pickChapter(chNum, el){
