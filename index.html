@@ -134,10 +134,10 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
 .audio-hint{font-size:11px;color:#5a5a78}
 /* Letters */
-.lans{min-height:48px;background:var(--s1);border:2px solid var(--brd);border-radius:12px;padding:8px 12px;display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:8px;transition:border-color .2s}
+.lans{min-height:60px;background:var(--s1);border:2px solid var(--brd);border-radius:12px;padding:10px 12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px;transition:border-color .2s}
 .lans.correct{border-color:var(--grn)}
 .lans.wrong{border-color:var(--acc)}
-.ltile{background:var(--s2);border:1px solid var(--brd);border-radius:7px;padding:5px 8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;user-select:none}
+.ltile{background:var(--s2);border:1px solid var(--brd);border-radius:9px;padding:9px 14px;font-family:'Syne',sans-serif;font-size:19px;font-weight:700;cursor:pointer;transition:all .15s;user-select:none;min-width:38px;text-align:center}
 .ltile:hover{background:var(--acc);border-color:var(--acc);color:#fff}
 .ltile.placed{background:var(--acc3);border-color:var(--acc3);color:#000}
 .ltile.ok{background:var(--grn);border-color:var(--grn);color:#000}
@@ -2148,11 +2148,11 @@ function pickOpt(btn,sel,correct,gi,mode){
 }
 
 // LETTER MODE
+function lDisplay(c){ return c===' ' ? '␣' : c; }
 function initLetters(word){
   placed=[];
+  // Only use the actual letters of the word (+ space tiles if word has spaces)
   var pool=word.split('').map(function(c,i){ return{c:c,id:i,p:false}; });
-  var ex='abcdefghijklmnopqrstuvwxyzäöü';
-  for(var i=0;i<Math.min(4,Math.floor(word.length*.5));i++) pool.push({c:ex[Math.floor(Math.random()*ex.length)],id:1000+i,p:false});
   pool.sort(function(){ return Math.random()-.5; });
   window._lp=pool;
   document.getElementById('lans').innerHTML='<span style="color:#44445a;font-size:12px">Нажимай буквы ниже…</span>';
@@ -2162,7 +2162,7 @@ function initLetters(word){
 function renderPool(){
   var a=document.getElementById('lpool'); a.innerHTML='';
   window._lp.filter(function(t){ return !t.p; }).forEach(function(t){
-    var el=document.createElement('span'); el.className='ltile'; el.textContent=t.c;
+    var el=document.createElement('span'); el.className='ltile'; el.textContent=lDisplay(t.c);
     (function(tile){ el.onclick=function(){ placeL(tile,el); }; })(t);
     a.appendChild(el);
   });
@@ -2172,7 +2172,7 @@ function placeL(tile,el){
   tile.p=true; placed.push(tile); el.remove();
   var aa=document.getElementById('lans');
   if(aa.querySelector('span[style]')) aa.innerHTML='';
-  var te=document.createElement('span'); te.className='ltile placed'; te.textContent=tile.c;
+  var te=document.createElement('span'); te.className='ltile placed'; te.textContent=lDisplay(tile.c);
   (function(t,e){ te.onclick=function(){ retL(t,e); }; })(tile,te);
   aa.appendChild(te);
   curAns=placed.map(function(t){ return t.c; }).join('');
