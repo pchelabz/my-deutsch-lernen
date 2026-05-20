@@ -2253,7 +2253,10 @@ function checkLetters(){
   document.getElementById('nxtbtn').classList.add('show');
 }
 
-function showFB(ok,msg){ var f=document.getElementById('fb'); f.textContent=msg; f.className='fb '+(ok?'correct':'wrong'); }
+function showFB(ok,msg){
+  var f=document.getElementById('fb'); f.textContent=msg; f.className='fb '+(ok?'correct':'wrong');
+  if(curW){ setTimeout(function(){ var u=new SpeechSynthesisUtterance(curW.de); u.lang='de-DE'; u.rate=0.85; speechSynthesis.cancel(); speechSynthesis.speak(u); }, 350); }
+}
 
 function nextQ(){
   qi++; placed=[];
