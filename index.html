@@ -156,6 +156,8 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
 .ltile.bad{background:var(--acc);border-color:var(--acc);color:#fff}
 .lpool{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
 .ahint{font-size:11px;color:#5a5a78;margin-bottom:6px}
+.write-area{margin-bottom:12px}
+.write-area .ifield{font-size:16px;padding:14px;margin-bottom:10px}
 /* Feedback */
 .fb{border-radius:11px;padding:11px 14px;margin-bottom:10px;font-size:13px;font-weight:500;display:none}
 .fb.correct{display:block;background:rgba(94,232,160,.08);border:1px solid var(--grn);color:var(--grn)}
@@ -267,13 +269,13 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
       <div class="mc-big-arr">›</div>
     </div>
 
-    <div class="menu-card disabled">
+    <div class="menu-card" onclick="showConjStudy()">
       <div class="mc-big-icon">🔄</div>
       <div class="mc-big-info">
         <div class="mc-big-name">Учу спряжения</div>
-        <div class="mc-big-desc">Тренировка глагольных форм по временам</div>
+        <div class="mc-big-desc">Тренировка глагольных форм в настоящем времени</div>
       </div>
-      <div class="mc-soon">Скоро</div>
+      <div class="mc-big-arr">›</div>
     </div>
 
     <div class="menu-card disabled">
@@ -314,6 +316,29 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
   </div>
 </div>
 
+<!-- ===== CONJ STUDY ===== -->
+<div id="conj-study" class="screen">
+  <div class="shdr">
+    <button class="back-btn" onclick="goHome()">← Назад</button>
+    <div class="shdr-title">Учу спряжения</div>
+  </div>
+  <div class="sbody">
+    <div class="modal-sub" style="margin-bottom:20px">Глаголы в настоящем времени (Präsens). Выбери тип задания.</div>
+    <div class="sec-lbl">Тип задания</div>
+    <div class="mode-grid2" id="conj-mode-grid">
+      <div class="mode-card selected" onclick="pickConjMode('conj-word',this)"><div class="mc-icon">🔤</div><div class="mc-name">Составь слово</div><div class="mc-desc">Инфинитив из букв</div></div>
+      <div class="mode-card" onclick="pickConjMode('conj-phrase',this)"><div class="mc-icon">📝</div><div class="mc-name">Составь фразу</div><div class="mc-desc">Форму глагола из букв</div></div>
+    </div>
+    <div class="mode-all" style="margin-bottom:8px">
+      <div class="mode-card" onclick="pickConjMode('conj-write',this)"><div class="mc-icon">✍️</div><div class="mc-name">Напиши фразу</div><div class="mc-desc">Введи форму глагола вручную</div></div>
+    </div>
+    <div class="mode-all">
+      <div class="mode-card" onclick="pickConjMode('conj-all',this)"><div class="mc-icon">🎯</div><div class="mc-name">Все типы</div><div class="mc-desc">Смешанный — все 3 типа заданий</div></div>
+    </div>
+    <button class="btn btn-red" onclick="startConjQuiz()">Начать</button>
+  </div>
+</div>
+
 <!-- ===== ADD WORDS ===-->
 <div id="add-words" class="screen">
   <div class="shdr">
@@ -348,7 +373,7 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
 <!-- ===== QUIZ ===== -->
 <div id="quiz" class="screen">
   <div class="qhdr">
-    <button class="back-btn" onclick="showVocabStudy()">← Назад</button>
+    <button class="back-btn" onclick="curChNum===-1?showConjStudy():showVocabStudy()">← Назад</button>
     <div class="prog-wrap">
       <div class="prog-lbl"><span id="qcur">1</span> / <span id="qtot">20</span><span id="qsc">✓ 0</span></div>
       <div class="prog-bar"><div class="prog-fill" id="pfill" style="width:0%"></div></div>
@@ -371,6 +396,10 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
       <div class="lans" id="lans"></div>
       <div class="lpool" id="lpool"></div>
       <button class="btn btn-red" id="chkbtn" onclick="checkLetters()" disabled style="margin-bottom:10px">Проверить</button>
+    </div>
+    <div id="write-area" class="write-area" style="display:none">
+      <input class="ifield" id="write-input" type="text" placeholder="Напиши фразу по-немецки…" onkeydown="if(event.key==='Enter'&&!answered)checkWrite()">
+      <button class="btn btn-red" id="wrtbtn" onclick="checkWrite()">Проверить</button>
     </div>
     <div class="fb" id="fb"></div>
     <button class="nxt" id="nxtbtn" onclick="nextQ()">Следующий вопрос →</button>
@@ -1894,6 +1923,34 @@ function rebuildMyWords(){
 }
 rebuildMyWords();
 
+// ==================== CONJUGATION DATA ====================
+var CONJ_WORDS = [
+  {de:"spazieren",ru:"гулять"},
+  {de:"einkaufen",ru:"делать покупки"},
+  {de:"schlafen",ru:"спать"},
+  {de:"fahren",ru:"ехать"},
+  {de:"nehmen",ru:"брать"},
+  {de:"waschen",ru:"мыть"},
+  {de:"vergessen",ru:"забывать"},
+  {de:"sehen",ru:"видеть"},
+  {de:"helfen",ru:"помогать"},
+  {de:"tragen",ru:"носить"},
+  {de:"laufen",ru:"бегать"},
+];
+var CONJ_PHRASES = [
+  {de:"ich spaziere",ru:"я гуляю"},{de:"du spazierst",ru:"ты гуляешь"},{de:"er/sie/es spaziert",ru:"он/она/оно гуляет"},{de:"wir spazieren",ru:"мы гуляем"},{de:"ihr spaziert",ru:"вы гуляете"},{de:"sie/Sie spazieren",ru:"они/Вы гуляют/гуляете"},
+  {de:"ich kaufe ein",ru:"я делаю покупки"},{de:"du kaufst ein",ru:"ты делаешь покупки"},{de:"er/sie/es kauft ein",ru:"он/она/оно делает покупки"},{de:"wir kaufen ein",ru:"мы делаем покупки"},{de:"ihr kauft ein",ru:"вы делаете покупки"},{de:"sie/Sie kaufen ein",ru:"они/Вы делают/делаете покупки"},
+  {de:"ich schlafe",ru:"я сплю"},{de:"du schläfst",ru:"ты спишь"},{de:"er/sie/es schläft",ru:"он/она/оно спит"},{de:"wir schlafen",ru:"мы спим"},{de:"ihr schlaft",ru:"вы спите"},{de:"sie/Sie schlafen",ru:"они/Вы спят/спите"},
+  {de:"ich fahre",ru:"я еду"},{de:"du fährst",ru:"ты едешь"},{de:"er/sie/es fährt",ru:"он/она/оно едет"},{de:"wir fahren",ru:"мы едем"},{de:"ihr fahrt",ru:"вы едете"},{de:"sie/Sie fahren",ru:"они/Вы едут/едете"},
+  {de:"ich nehme",ru:"я беру"},{de:"du nimmst",ru:"ты берёшь"},{de:"er/sie/es nimmt",ru:"он/она/оно берёт"},{de:"wir nehmen",ru:"мы берём"},{de:"ihr nehmt",ru:"вы берёте"},{de:"sie/Sie nehmen",ru:"они/Вы берут/берёте"},
+  {de:"ich wasche",ru:"я мою"},{de:"du wäschst",ru:"ты моешь"},{de:"er/sie/es wäscht",ru:"он/она/оно моет"},{de:"wir waschen",ru:"мы моем"},{de:"ihr wascht",ru:"вы моете"},{de:"sie/Sie waschen",ru:"они/Вы моют/моете"},
+  {de:"ich vergesse",ru:"я забываю"},{de:"du vergisst",ru:"ты забываешь"},{de:"er/sie/es vergisst",ru:"он/она/оно забывает"},{de:"wir vergessen",ru:"мы забываем"},{de:"ihr vergesst",ru:"вы забываете"},{de:"sie/Sie vergessen",ru:"они/Вы забывают/забываете"},
+  {de:"ich sehe",ru:"я вижу"},{de:"du siehst",ru:"ты видишь"},{de:"er/sie/es sieht",ru:"он/она/оно видит"},{de:"wir sehen",ru:"мы видим"},{de:"ihr seht",ru:"вы видите"},{de:"sie/Sie sehen",ru:"они/Вы видят/видите"},
+  {de:"ich helfe",ru:"я помогаю"},{de:"du hilfst",ru:"ты помогаешь"},{de:"er/sie/es hilft",ru:"он/она/оно помогает"},{de:"wir helfen",ru:"мы помогаем"},{de:"ihr helft",ru:"вы помогаете"},{de:"sie/Sie helfen",ru:"они/Вы помогают/помогаете"},
+  {de:"ich trage",ru:"я ношу"},{de:"du trägst",ru:"ты носишь"},{de:"er/sie/es trägt",ru:"он/она/оно носит"},{de:"wir tragen",ru:"мы носим"},{de:"ihr tragt",ru:"вы носите"},{de:"sie/Sie tragen",ru:"они/Вы носят/носите"},
+  {de:"ich laufe",ru:"я бегаю"},{de:"du läufst",ru:"ты бегаешь"},{de:"er/sie/es läuft",ru:"он/она/оно бегает"},{de:"wir laufen",ru:"мы бегаем"},{de:"ihr lauft",ru:"вы бегаете"},{de:"sie/Sie laufen",ru:"они/Вы бегают/бегаете"},
+];
+
 // ==================== STATE ====================
 var selChapter = 0; // 0 = all, else chapter num
 var selMode = 'mc-de';
@@ -2080,8 +2137,9 @@ function showVocabStudy(){
 
 // ==================== QUIZ LOGIC ====================
 var MODES=['mc-de','mc-ru','audio','letter'];
-var ML={'mc-de':'🇩🇪 DE','mc-ru':'🇷🇺 RU','audio':'🔊 Слух','letter':'🔤 Буквы','all':'🎯 Микс'};
-var BDCLS={'mc-de':'bd1','mc-ru':'bd2','audio':'bd3','letter':'bd4','all':'bd1'};
+var ML={'mc-de':'🇩🇪 DE','mc-ru':'🇷🇺 RU','audio':'🔊 Слух','letter':'🔤 Буквы','all':'🎯 Микс','conj-word':'🔤 Слово','conj-phrase':'📝 Фраза','conj-write':'✍️ Напиши','conj-all':'🎯 Все типы'};
+var BDCLS={'mc-de':'bd1','mc-ru':'bd2','audio':'bd3','letter':'bd4','all':'bd1','conj-word':'bd4','conj-phrase':'bd2','conj-write':'bd3','conj-all':'bd1'};
+var selConjMode = 'conj-word';
 
 function getPool(){
   return selChapter===0 ? WORDS : WORDS.filter(function(w){ return w.chNum===selChapter; });
@@ -2140,6 +2198,10 @@ function renderQ(){
   document.getElementById('opts').innerHTML=''; document.getElementById('opts').style.display='';
   document.getElementById('audio-area').style.display='none';
   document.getElementById('letter-area').style.display='none';
+  document.getElementById('write-area').style.display='none';
+  document.getElementById('write-input').value='';
+  document.getElementById('write-input').disabled=false;
+  document.getElementById('wrtbtn').disabled=false;
   document.getElementById('fb').className='fb';
   document.getElementById('nxtbtn').className='nxt';
   var m=q.m;
@@ -2160,6 +2222,27 @@ function renderQ(){
     document.getElementById('audio-area').style.display='block';
     setTimeout(speak,400);
     renderMC('ru',w);
+  } else if(m==='conj-word'){
+    document.getElementById('qtype').textContent='СОСТАВЬ СЛОВО ПО-НЕМЕЦКИ';
+    document.getElementById('qword').textContent=w.ru;
+    document.getElementById('qhint').textContent='инфинитив';
+    document.getElementById('opts').style.display='none';
+    document.getElementById('letter-area').style.display='block';
+    initLetters(w.de);
+  } else if(m==='conj-phrase'){
+    document.getElementById('qtype').textContent='СОСТАВЬ ФРАЗУ ПО-НЕМЕЦКИ';
+    document.getElementById('qword').textContent=w.ru;
+    document.getElementById('qhint').textContent='';
+    document.getElementById('opts').style.display='none';
+    document.getElementById('letter-area').style.display='block';
+    initLetters(w.de);
+  } else if(m==='conj-write'){
+    document.getElementById('qtype').textContent='НАПИШИ ФРАЗУ ПО-НЕМЕЦКИ';
+    document.getElementById('qword').textContent=w.ru;
+    document.getElementById('qhint').textContent='';
+    document.getElementById('opts').style.display='none';
+    document.getElementById('write-area').style.display='block';
+    setTimeout(function(){ document.getElementById('write-input').focus(); }, 100);
   } else {
     document.getElementById('qtype').textContent='СОСТАВЬ СЛОВО ПО-НЕМЕЦКИ';
     document.getElementById('qword').textContent=w.ru;
@@ -2247,7 +2330,7 @@ function checkLetters(){
   var ok=base(curAns)===base(correct)||curAns.toLowerCase()===correct.toLowerCase();
   document.getElementById('lans').className='lans '+(ok?'correct':'wrong');
   document.getElementById('chkbtn').disabled=true;
-  rec(curW.globalIdx,curQMode,!ok);
+  if(curW.globalIdx!=null) rec(curW.globalIdx,curQMode,!ok);
   if(ok){ score++; showFB(true,'Правильно! 🎉'); document.querySelectorAll('#lans .ltile').forEach(function(t){ t.classList.remove('placed'); t.classList.add('ok'); }); }
   else { errs++; showFB(false,'Неверно. Правильный ответ: '+correct); document.querySelectorAll('#lans .ltile').forEach(function(t){ t.classList.remove('placed'); t.classList.add('bad'); }); }
   document.getElementById('nxtbtn').classList.add('show');
@@ -2273,6 +2356,58 @@ function speak(){
   speechSynthesis.cancel(); speechSynthesis.speak(u);
 }
 
+// ==================== CONJUGATION QUIZ ====================
+function showConjStudy(){
+  showScreen('conj-study');
+}
+function pickConjMode(m, el){
+  selConjMode = m;
+  document.querySelectorAll('#conj-mode-grid .mode-card, #conj-study .mode-all .mode-card').forEach(function(c){ c.classList.remove('selected'); });
+  el.classList.add('selected');
+}
+function buildConjQuestions(mode, count){
+  count = count||15;
+  var pool, qs;
+  if(mode==='conj-word'){
+    pool = CONJ_WORDS.slice().sort(function(){ return Math.random()-.5; });
+    return pool.slice(0,Math.min(count,pool.length)).map(function(w){ return {w:{de:w.de,ru:w.ru,globalIdx:null},m:'conj-word'}; });
+  } else if(mode==='conj-phrase'){
+    pool = CONJ_PHRASES.slice().sort(function(){ return Math.random()-.5; });
+    return pool.slice(0,Math.min(count,pool.length)).map(function(w){ return {w:{de:w.de,ru:w.ru,globalIdx:null},m:'conj-phrase'}; });
+  } else if(mode==='conj-write'){
+    pool = CONJ_PHRASES.slice().sort(function(){ return Math.random()-.5; });
+    return pool.slice(0,Math.min(count,pool.length)).map(function(w){ return {w:{de:w.de,ru:w.ru,globalIdx:null},m:'conj-write'}; });
+  } else { // conj-all: mix all types
+    var all=[];
+    CONJ_WORDS.forEach(function(w){ all.push({w:{de:w.de,ru:w.ru,globalIdx:null},m:'conj-word'}); });
+    CONJ_PHRASES.forEach(function(w){ all.push({w:{de:w.de,ru:w.ru,globalIdx:null},m:'conj-phrase'}); });
+    CONJ_PHRASES.forEach(function(w){ all.push({w:{de:w.de,ru:w.ru,globalIdx:null},m:'conj-write'}); });
+    all.sort(function(){ return Math.random()-.5; });
+    return all.slice(0,count);
+  }
+}
+function startConjQuiz(){
+  curMode = selConjMode; curChNum = -1;
+  qs = buildConjQuestions(selConjMode, 15);
+  qi=0; score=0; errs=0; answered=false; t0=Date.now();
+  document.getElementById('qtot').textContent=qs.length;
+  var b=document.getElementById('qbadge');
+  b.textContent=ML[selConjMode]||'🔄'; b.className='qbadge '+(BDCLS[selConjMode]||'bd4');
+  showScreen('quiz');
+  renderQ();
+}
+function checkWrite(){
+  if(answered) return; answered=true;
+  var correct=curW.de;
+  var input=document.getElementById('write-input').value.trim();
+  var ok=input.toLowerCase()===correct.toLowerCase();
+  document.getElementById('write-input').disabled=true;
+  document.getElementById('wrtbtn').disabled=true;
+  if(ok){ score++; showFB(true,'Правильно! 🎉'); }
+  else { errs++; showFB(false,'Неверно. Правильный ответ: '+correct); }
+  document.getElementById('nxtbtn').classList.add('show');
+}
+
 // ==================== RESULTS ====================
 function showResults(){
   var pct=Math.round(score/qs.length*100);
@@ -2282,7 +2417,7 @@ function showResults(){
   document.getElementById('rlbl').textContent=pct>=80?'Отлично!':pct>=50?'Хороший результат!':'Нужно повторить!';
   document.getElementById('rright').textContent=score;
   document.getElementById('rwrong').textContent=errs;
-  document.getElementById('rchap').textContent=curChNum===0?'Все главы':'Kapitel '+curChNum;
+  document.getElementById('rchap').textContent=curChNum===-1?'🔄 Спряжения':curChNum===0?'Все главы':'Kapitel '+curChNum;
   document.getElementById('rmode').textContent=ML[curMode];
   var el=Math.round((Date.now()-t0)/1000);
   document.getElementById('rtime').textContent=el<60?el+' сек':Math.floor(el/60)+' мин '+(el%60)+' сек';
