@@ -1868,9 +1868,13 @@ function buildChapterGrid(){
 
   CHAPTERS.forEach(function(ch){
     var wordsInCh = WORDS.filter(function(w){ return w.chNum===ch.num; });
-    var studied = wordsInCh.filter(function(w){ return ST[w.globalIdx] && Object.values(ST[w.globalIdx]).some(function(m){ return m.a>0; }); }).length;
+    var studied = wordsInCh.filter(function(w){ return totalAttempts(w.globalIdx)>0; }).length;
+    var newLeft = wordsInCh.length - studied;
     var pct = wordsInCh.length ? Math.round(studied/wordsInCh.length*100) : 0;
     var r = 16, circ = 2*Math.PI*r, dash = circ * pct/100;
+
+    var metaStr = studied+'/'+wordsInCh.length+' изучено';
+    if(newLeft > 0) metaStr += ' · <span style="color:#5ee8a0;font-weight:600">'+newLeft+' новых</span>';
 
     var card = document.createElement('div');
     card.className = 'ch-card' + (selChapter===ch.num?' selected':'');
@@ -1879,7 +1883,7 @@ function buildChapterGrid(){
       '<div class="ch-num">'+ch.num+'</div>'+
       '<div class="ch-info">'+
         '<div class="ch-name">Kapitel '+ch.num+': '+ch.name+'</div>'+
-        '<div class="ch-meta">'+wordsInCh.length+' слов · '+studied+' изучено</div>'+
+        '<div class="ch-meta">'+metaStr+'</div>'+
       '</div>'+
       '<div class="ch-prog">'+
         '<svg width="36" height="36" viewBox="0 0 36 36">'+
@@ -2003,6 +2007,10 @@ function totalErrs(gi){
   if(!ST[gi]) return 0;
   return Object.values(ST[gi]).reduce(function(s,m){ return s+m.e; },0);
 }
+function totalAttempts(gi){
+  if(!ST[gi]) return 0;
+  return Object.values(ST[gi]).reduce(function(s,m){ return s+m.a; },0);
+}
 
 // ==================== NAVIGATION ====================
 function showScreen(id){
@@ -2028,10 +2036,29 @@ function getPool(){
 function buildQuestions(mode, count){
   count = count||20;
   var pool = getPool().slice();
-  pool.sort(function(a,b){ return totalErrs(b.globalIdx)-totalErrs(a.globalIdx)+(Math.random()-.5); });
-  if(pool.length<4) pool = getPool().slice(); // safety
-  pool = pool.slice(0, Math.min(count, pool.length));
-  return pool.map(function(w){
+
+  // Split into unseen (never attempted) and seen (attempted at least once)
+  var unseen = pool.filter(function(w){ return totalAttempts(w.globalIdx)===0; });
+  var seen   = pool.filter(function(w){ return totalAttempts(w.globalIdx)>0; });
+
+  var working;
+  if(unseen.length > 0){
+    // New words first: only pick from unseen, shuffled randomly
+    working = unseen.slice().sort(function(){ return Math.random()-.5; });
+  } else {
+    // All words seen — repeat mode: sort by most errors first
+    working = seen.slice().sort(function(a,b){
+      return totalErrs(b.globalIdx) - totalErrs(a.globalIdx) + (Math.random()-.5);
+    });
+  }
+
+  // Safety: need ≥4 words for MC distractors
+  if(working.length < 4){
+    working = pool.slice().sort(function(){ return Math.random()-.5; });
+  }
+
+  working = working.slice(0, Math.min(count, working.length));
+  return working.map(function(w){
     var m = mode==='all' ? MODES[Math.floor(Math.random()*4)] : mode;
     return {w:w, m:m};
   });
