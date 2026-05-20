@@ -68,6 +68,18 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
 .mode-all{margin-bottom:16px}
 .mode-all .mode-card{grid-column:1/-1}
 
+/* Main menu cards */
+.menu-card{background:var(--s1);border:1px solid var(--brd);border-radius:16px;padding:20px 18px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:16px;margin-bottom:10px}
+.menu-card:hover{border-color:var(--acc);transform:translateY(-1px);background:var(--s2)}
+.menu-card.disabled{opacity:.45;cursor:not-allowed}
+.menu-card.disabled:hover{border-color:var(--brd);transform:none;background:var(--s1)}
+.mc-big-icon{font-size:28px;flex-shrink:0}
+.mc-big-info{flex:1}
+.mc-big-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:4px}
+.mc-big-desc{font-size:12px;color:#5a5a78;line-height:1.4}
+.mc-big-arr{color:#44445a;font-size:18px;flex-shrink:0}
+.mc-soon{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;background:var(--s3);color:#5a5a78;flex-shrink:0;font-family:'Syne',sans-serif;letter-spacing:.5px}
+
 /* Buttons */
 .btn{border:none;border-radius:12px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;transition:all .2s;width:100%}
 .btn-red{background:var(--acc);color:#fff;padding:15px;font-size:15px;margin-bottom:8px}
@@ -227,7 +239,7 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
   <div class="home-scroll">
     <div class="home-logo">Netzwerk neu A1</div>
     <div class="home-title">Deutsch<br><em>Lernen</em></div>
-    <div class="home-sub">Выбери главу и режим тренировки</div>
+    <div class="home-sub">Выбери режим тренировки</div>
 
     <div class="stats-bar">
       <div class="stat-box"><div class="stat-num" id="h-total">0</div><div class="stat-lbl">Слов всего</div></div>
@@ -244,6 +256,47 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
       <span style="color:#44445a;font-size:14px">›</span>
     </div>
 
+    <div class="sec-lbl">Режим обучения</div>
+
+    <div class="menu-card" onclick="showVocabStudy()">
+      <div class="mc-big-icon">📚</div>
+      <div class="mc-big-info">
+        <div class="mc-big-name">Учу слова</div>
+        <div class="mc-big-desc">Карточки, перевод, аудио и составление слов по главам</div>
+      </div>
+      <div class="mc-big-arr">›</div>
+    </div>
+
+    <div class="menu-card disabled">
+      <div class="mc-big-icon">🔄</div>
+      <div class="mc-big-info">
+        <div class="mc-big-name">Учу спряжения</div>
+        <div class="mc-big-desc">Тренировка глагольных форм по временам</div>
+      </div>
+      <div class="mc-soon">Скоро</div>
+    </div>
+
+    <div class="menu-card disabled">
+      <div class="mc-big-icon">⚥</div>
+      <div class="mc-big-info">
+        <div class="mc-big-name">Учу род</div>
+        <div class="mc-big-desc">der / die / das — угадай артикль</div>
+      </div>
+      <div class="mc-soon">Скоро</div>
+    </div>
+
+    <button class="btn btn-ghost" onclick="showStats()" style="margin-top:8px">📊 Статистика ошибок</button>
+    <button class="btn btn-ghost" onclick="showAddWords()">✏️ Мои слова</button>
+  </div>
+</div>
+
+<!-- ===== VOCAB STUDY ===== -->
+<div id="vocab-study" class="screen">
+  <div class="shdr">
+    <button class="back-btn" onclick="goHome()">← Назад</button>
+    <div class="shdr-title">Учу слова</div>
+  </div>
+  <div class="sbody">
     <div class="sec-lbl">Выбери главу</div>
     <div class="chapter-grid" id="chapter-grid"></div>
 
@@ -257,10 +310,7 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
     <div class="mode-all">
       <div class="mode-card" onclick="pickMode('all',this)"><div class="mc-icon">🎯</div><div class="mc-name">Все режимы</div><div class="mc-desc">Смешанный — все 4 типа заданий</div></div>
     </div>
-
-    <button class="btn btn-red" onclick="startQuiz()" id="start-btn">Начать</button>
-    <button class="btn btn-ghost" onclick="showStats()">📊 Статистика ошибок</button>
-    <button class="btn btn-ghost" onclick="showAddWords()">✏️ Мои слова</button>
+    <button class="btn btn-red" onclick="startQuiz()">Начать</button>
   </div>
 </div>
 
@@ -298,7 +348,7 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
 <!-- ===== QUIZ ===== -->
 <div id="quiz" class="screen">
   <div class="qhdr">
-    <button class="back-btn" onclick="goHome()">← Назад</button>
+    <button class="back-btn" onclick="showVocabStudy()">← Назад</button>
     <div class="prog-wrap">
       <div class="prog-lbl"><span id="qcur">1</span> / <span id="qtot">20</span><span id="qsc">✓ 0</span></div>
       <div class="prog-bar"><div class="prog-fill" id="pfill" style="width:0%"></div></div>
@@ -2018,10 +2068,14 @@ function showScreen(id){
   document.getElementById(id).classList.add('active');
 }
 function goHome(){
-  buildChapterGrid();
   updateHomeStats();
   updateSyncUI();
   showScreen('home');
+}
+function showVocabStudy(){
+  buildChapterGrid();
+  updateHomeStats();
+  showScreen('vocab-study');
 }
 
 // ==================== QUIZ LOGIC ====================
