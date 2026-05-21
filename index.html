@@ -323,7 +323,8 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
     <div class="shdr-title">Учу спряжения</div>
   </div>
   <div class="sbody">
-    <div class="modal-sub" style="margin-bottom:20px">Глаголы в настоящем времени (Präsens). Выбери тип задания.</div>
+    <div class="modal-sub" style="margin-bottom:16px">Глаголы в настоящем времени (Präsens). Выбери тип задания.</div>
+    <div id="conj-progress-block" style="margin-bottom:20px"></div>
     <div class="sec-lbl">Тип задания</div>
     <div class="mode-grid2" id="conj-mode-grid">
       <div class="mode-card selected" onclick="pickConjMode('conj-word',this)"><div class="mc-icon">🔤</div><div class="mc-name">Составь слово</div><div class="mc-desc">Инфинитив из букв</div></div>
@@ -2061,6 +2062,7 @@ var qs=[], qi=0, score=0, errs=0, answered=false;
 var t0=null, curW=null, curQMode='', curAns='';
 var placed=[], curStatFilter='all';
 var ST = JSON.parse(localStorage.getItem('de-st2')||'{}');
+var CONJ_ST = JSON.parse(localStorage.getItem('de-conj-st')||'{}');
 var gasUrl = localStorage.getItem('de-gas-url')||'';
 
 // ==================== CHAPTER UI ====================
@@ -2247,6 +2249,13 @@ function totalErrs(gi){
 function totalAttempts(gi){
   if(!ST[gi]) return 0;
   return Object.values(ST[gi]).reduce(function(s,m){ return s+m.a; },0);
+}
+function saveConjST(){ localStorage.setItem('de-conj-st', JSON.stringify(CONJ_ST)); }
+function recConj(key, isErr){
+  if(!CONJ_ST[key]) CONJ_ST[key]={a:0,e:0};
+  CONJ_ST[key].a++;
+  if(isErr) CONJ_ST[key].e++;
+  saveConjST();
 }
 
 // ==================== NAVIGATION ====================
@@ -2461,6 +2470,7 @@ function checkLetters(){
   document.getElementById('lans').className='lans '+(ok?'correct':'wrong');
   document.getElementById('chkbtn').disabled=true;
   if(curW.globalIdx!=null) rec(curW.globalIdx,curQMode,!ok);
+  else recConj(curW.de, !ok);
   if(ok){ score++; showFB(true,'Правильно! 🎉'); document.querySelectorAll('#lans .ltile').forEach(function(t){ t.classList.remove('placed'); t.classList.add('ok'); }); }
   else { errs++; showFB(false,'Неверно. Правильный ответ: '+correct); document.querySelectorAll('#lans .ltile').forEach(function(t){ t.classList.remove('placed'); t.classList.add('bad'); }); }
   document.getElementById('nxtbtn').classList.add('show');
@@ -2487,8 +2497,28 @@ function speak(){
 }
 
 // ==================== CONJUGATION QUIZ ====================
+function updateConjProgress(){
+  var wTotal=CONJ_WORDS.length, wSeen=CONJ_WORDS.filter(function(w){return CONJ_ST[w.de]&&CONJ_ST[w.de].a>0;}).length;
+  var pTotal=CONJ_PHRASES.length, pSeen=CONJ_PHRASES.filter(function(p){return CONJ_ST[p.de]&&CONJ_ST[p.de].a>0;}).length;
+  var wLeft=wTotal-wSeen, pLeft=pTotal-pSeen;
+  var wPct=Math.round(wSeen/wTotal*100), pPct=Math.round(pSeen/pTotal*100);
+  function card(icon,label,seen,total,left,pct,color){
+    return '<div style="flex:1;background:var(--s2);border:1px solid var(--brd);border-radius:12px;padding:12px 14px">'+
+      '<div style="font-size:10px;color:#5a5a78;margin-bottom:4px;font-family:Syne,sans-serif;font-weight:700">'+icon+' '+label+'</div>'+
+      '<div style="font-size:18px;font-weight:800;font-family:Syne,sans-serif;line-height:1;margin-bottom:6px">'+seen+'<span style="font-size:12px;font-weight:500;color:#5a5a78"> / '+total+'</span></div>'+
+      '<div style="background:var(--s3);border-radius:4px;height:4px;overflow:hidden"><div style="background:'+color+';width:'+pct+'%;height:100%;border-radius:4px"></div></div>'+
+      '<div style="font-size:11px;margin-top:5px;color:'+(left>0?'#5ee8a0':'var(--grn)')+'">'+( left>0?left+' новых':'Все пройдено ✓')+'</div>'+
+    '</div>';
+  }
+  document.getElementById('conj-progress-block').innerHTML=
+    '<div style="display:flex;gap:10px">'+
+      card('🔤','ИНФИНИТИВЫ',wSeen,wTotal,wLeft,wPct,'var(--grn)')+
+      card('📝','ФОРМЫ',pSeen,pTotal,pLeft,pPct,'var(--acc2)')+
+    '</div>';
+}
 function showConjStudy(){
   showScreen('conj-study');
+  updateConjProgress();
 }
 function pickConjMode(m, el){
   selConjMode = m;
@@ -2535,6 +2565,7 @@ function checkWrite(){
   document.getElementById('wrtbtn').disabled=true;
   if(ok){ score++; showFB(true,'Правильно! 🎉'); }
   else { errs++; showFB(false,'Неверно. Правильный ответ: '+correct); }
+  recConj(curW.de, !ok);
   document.getElementById('nxtbtn').classList.add('show');
 }
 
