@@ -446,7 +446,7 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
   </div>
   <div class="sync-note" id="snote">💾 Сохранено локально</div>
   <div class="res-acts">
-    <button class="btn btn-red" onclick="startQuiz()">Повторить</button>
+    <button class="btn btn-red" onclick="repeatQuiz()">Повторить</button>
     <button class="btn btn-ghost" onclick="showStats()">📊 Статистика</button>
     <button class="btn btn-ghost" onclick="goHome()">На главную</button>
   </div>
@@ -2393,6 +2393,11 @@ function buildQuestions(mode, count){
   });
 }
 
+function repeatQuiz(){
+  if(curChNum===-1) startConjQuiz();
+  else if(curChNum===-2) startGenderQuiz();
+  else startQuiz();
+}
 function startQuiz(){
   var pool = getPool();
   if(pool.length < 4){ alert('В этой главе слишком мало слов (нужно минимум 4). Выбери другую главу или «Все главы».'); return; }
