@@ -2525,25 +2525,38 @@ function pickConjMode(m, el){
   document.querySelectorAll('#conj-mode-grid .mode-card, #conj-study .mode-all .mode-card').forEach(function(c){ c.classList.remove('selected'); });
   el.classList.add('selected');
 }
+function conjSeen(de){ return CONJ_ST[de] && CONJ_ST[de].a > 0; }
+function conjErrs(de){ return CONJ_ST[de] ? CONJ_ST[de].e : 0; }
+function unseenFirst(pool){
+  var unseen = pool.filter(function(x){ return !conjSeen(x.de); });
+  var seen   = pool.filter(function(x){ return  conjSeen(x.de); });
+  if(unseen.length > 0) return unseen.slice().sort(function(){ return Math.random()-.5; });
+  return seen.slice().sort(function(a,b){ return conjErrs(b.de)-conjErrs(a.de)+(Math.random()-.5); });
+}
 function buildConjQuestions(mode, count){
   count = count||15;
-  var pool, qs;
   if(mode==='conj-word'){
-    pool = CONJ_WORDS.slice().sort(function(){ return Math.random()-.5; });
+    var pool = unseenFirst(CONJ_WORDS);
     return pool.slice(0,Math.min(count,pool.length)).map(function(w){ return {w:{de:w.de,ru:w.ru,globalIdx:null},m:'conj-word'}; });
   } else if(mode==='conj-phrase'){
-    pool = CONJ_PHRASES.slice().sort(function(){ return Math.random()-.5; });
+    var pool = unseenFirst(CONJ_PHRASES);
     return pool.slice(0,Math.min(count,pool.length)).map(function(w){ return {w:{de:w.de,ru:w.ru,globalIdx:null},m:'conj-phrase'}; });
   } else if(mode==='conj-write'){
-    pool = CONJ_PHRASES.slice().sort(function(){ return Math.random()-.5; });
+    var pool = unseenFirst(CONJ_PHRASES);
     return pool.slice(0,Math.min(count,pool.length)).map(function(w){ return {w:{de:w.de,ru:w.ru,globalIdx:null},m:'conj-write'}; });
-  } else { // conj-all: mix all types
-    var all=[];
-    CONJ_WORDS.forEach(function(w){ all.push({w:{de:w.de,ru:w.ru,globalIdx:null},m:'conj-word'}); });
-    CONJ_PHRASES.forEach(function(w){ all.push({w:{de:w.de,ru:w.ru,globalIdx:null},m:'conj-phrase'}); });
-    CONJ_PHRASES.forEach(function(w){ all.push({w:{de:w.de,ru:w.ru,globalIdx:null},m:'conj-write'}); });
-    all.sort(function(){ return Math.random()-.5; });
-    return all.slice(0,count);
+  } else { // conj-all: unseen-first across all three task types
+    var wUnseen = CONJ_WORDS.filter(function(w){ return !conjSeen(w.de); });
+    var wSeen   = CONJ_WORDS.filter(function(w){ return  conjSeen(w.de); });
+    var pUnseen = CONJ_PHRASES.filter(function(p){ return !conjSeen(p.de); });
+    var pSeen   = CONJ_PHRASES.filter(function(p){ return  conjSeen(p.de); });
+    var allUnseen=[], allSeen=[];
+    wUnseen.forEach(function(w){ allUnseen.push({w:{de:w.de,ru:w.ru,globalIdx:null},m:'conj-word'}); });
+    pUnseen.forEach(function(p){ allUnseen.push({w:{de:p.de,ru:p.ru,globalIdx:null},m:Math.random()<.5?'conj-phrase':'conj-write'}); });
+    wSeen.forEach(function(w){ allSeen.push({w:{de:w.de,ru:w.ru,globalIdx:null},m:'conj-word'}); });
+    pSeen.forEach(function(p){ allSeen.push({w:{de:p.de,ru:p.ru,globalIdx:null},m:Math.random()<.5?'conj-phrase':'conj-write'}); });
+    var working = allUnseen.length > 0 ? allUnseen : allSeen;
+    working.sort(function(){ return Math.random()-.5; });
+    return working.slice(0,count);
   }
 }
 function startConjQuiz(){
