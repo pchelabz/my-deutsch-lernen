@@ -2280,7 +2280,7 @@ function closeModal(){ document.getElementById('modal').classList.add('hidden');
 function saveGas(){
   var url=document.getElementById('inp-url').value.trim();
   if(!url){alert('Вставь URL!');return;}
-  if(!url.startsWith('https://script.google.com')){alert('URL должен начинаться с https://script.google.com');return;}
+  if(!url.startsWith('https://script.google.com')||url.indexOf('/macros/s/')<0){alert('Некорректный URL. Используй ссылку вида https://script.google.com/macros/s/...');return;}
   gasUrl=url; localStorage.setItem("de-gas-url",gasUrl); closeModal(); updateSyncUI(); if(Object.keys(ST).length>0) doSync();
 }
 function disconnectGas(){
@@ -2598,17 +2598,22 @@ function showFB(ok,msg){
 
 function nextQ(){
   qi++; placed=[];
-  if(window._lp) window._lp.forEach(function(t){ t.p=false; });
+  if(window._lp){ window._lp.forEach(function(t){ t.p=false; }); window._lp=null; }
   if(qi>=qs.length){ showResults(); return; }
   renderQ();
 }
 
 function speak(){
   if(!curW) return;
-  var b=document.getElementById('abtn'); b.classList.add('speaking');
-  var u=new SpeechSynthesisUtterance(curW.de); u.lang='de-DE'; u.rate=0.85;
+  var b=document.getElementById('abtn');
+  b.classList.remove('speaking');
+  b.classList.add('speaking');
+  var u=new SpeechSynthesisUtterance(curW.speakText||curW.de);
+  u.lang='de-DE'; u.rate=0.85;
   u.onend=function(){ b.classList.remove('speaking'); };
-  speechSynthesis.cancel(); speechSynthesis.speak(u);
+  u.onerror=function(){ b.classList.remove('speaking'); };
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
 }
 
 // ==================== CONJUGATION QUIZ ====================
@@ -2747,7 +2752,10 @@ function updateGenderProgress(){
     '<div style="font-size:11px;margin-top:5px;color:'+(left>0?'#5ee8a0':'var(--grn)')+'">'+( left>0?left+' новых':'Все пройдено ✓')+'</div>'+
     '</div>';
 }
-function showGenderStudy(){ showScreen('gender-study'); buildGenderPackGrid(); updateGenderProgress(); }
+function showGenderStudy(){
+  if(selGenderPack<0||selGenderPack>=GENDER_PACKS.length) selGenderPack=0;
+  showScreen('gender-study'); buildGenderPackGrid(); updateGenderProgress();
+}
 function pickGenderMode(m, el){
   selGenderMode = m;
   document.querySelectorAll('#gender-mode-grid .mode-card, #gender-study .mode-all .mode-card').forEach(function(c){ c.classList.remove('selected'); });
@@ -2769,8 +2777,8 @@ function checkGenderMC(art){
   var ok=(art===correct);
   document.querySelectorAll('#opts .opt').forEach(function(b){
     b.disabled=true;
-    if(b.textContent===correct) b.style.background='rgba(94,232,160,.25)';
-    else if(b.textContent===art && !ok) b.style.background='rgba(255,80,80,.2)';
+    if(b.textContent===correct) b.classList.add('correct');
+    else if(b.textContent===art && !ok) b.classList.add('wrong');
   });
   if(ok){ score++; showFB(true,'Правильно! 🎉 '+correct+' '+curW.ru); }
   else { errs++; showFB(false,'Неверно. Правильный артикль: '+correct+' '+curW.ru); }
@@ -2853,11 +2861,23 @@ function showStats(){
   renderWList(curStatFilter);
   renderConjStatList(curConjFilter);
   renderGenderStatList(curGenderFilter);
+  // restore saved tab
+  var savedTab=localStorage.getItem('de-stat-tab')||'vocab';
+  if(savedTab!==curStatSection){
+    curStatSection=savedTab;
+    var el=document.getElementById('stab-'+savedTab);
+    if(el) el.click();
+  } else {
+    document.getElementById('stsec-vocab').style.display  = curStatSection==='vocab'  ? '' : 'none';
+    document.getElementById('stsec-conj').style.display   = curStatSection==='conj'   ? '' : 'none';
+    document.getElementById('stsec-gender').style.display = curStatSection==='gender' ? '' : 'none';
+  }
   showScreen('stats-page');
 }
 
 function sSection(s, el){
   curStatSection = s;
+  localStorage.setItem('de-stat-tab', s);
   document.querySelectorAll('#stats-page .shdr~.sbody>.ftabs .ftab').forEach(function(t){ t.classList.remove('active'); });
   el.classList.add('active');
   document.getElementById('stsec-vocab').style.display  = s==='vocab'  ? '' : 'none';
