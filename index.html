@@ -347,8 +347,9 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
     <div class="shdr-title">Учу род</div>
   </div>
   <div class="sbody">
-    <div class="modal-sub" style="margin-bottom:16px">der / die / das — артикли существительных. Выбери тип задания.</div>
-    <div id="gender-progress-block" style="margin-bottom:20px"></div>
+    <div class="sec-lbl">Пакет слов</div>
+    <div id="gender-pack-grid" style="margin-bottom:4px"></div>
+    <div id="gender-progress-block" style="margin-bottom:16px"></div>
     <div class="sec-lbl">Тип задания</div>
     <div class="mode-grid2" id="gender-mode-grid">
       <div class="mode-card selected" onclick="pickGenderMode('gender-mc',this)"><div class="mc-icon">⚥</div><div class="mc-name">Угадай род</div><div class="mc-desc">Выбери артикль</div></div>
@@ -2079,11 +2080,13 @@ var CONJ_PHRASES = [
 ];
 
 // ==================== GENDER DATA ====================
-var GENDER_WORDS = [
-  {de:"Hochzeit", ru:"свадьба",    art:"die"},
-  {de:"Wetter",   ru:"погода",     art:"das"},
-  {de:"Regen",    ru:"дождь",      art:"der"},
-  {de:"Feuerzeug",ru:"зажигалка",  art:"das"},
+var GENDER_PACKS = [
+  { num:1, name:"Пакет 1", words:[
+    {de:"Hochzeit",  ru:"свадьба",    art:"die"},
+    {de:"Wetter",    ru:"погода",     art:"das"},
+    {de:"Regen",     ru:"дождь",      art:"der"},
+    {de:"Feuerzeug", ru:"зажигалка",  art:"das"},
+  ]},
 ];
 
 // ==================== STATE ====================
@@ -2311,8 +2314,9 @@ function showVocabStudy(){
 var MODES=['mc-de','mc-ru','audio','letter'];
 var ML={'mc-de':'🇩🇪 DE','mc-ru':'🇷🇺 RU','audio':'🔊 Слух','letter':'🔤 Буквы','all':'🎯 Микс','conj-word':'🔤 Слово','conj-phrase':'📝 Фраза','conj-write':'✍️ Напиши','conj-all':'🎯 Все типы','gender-mc':'⚥ Род','gender-letter':'🔤 Слово','gender-write':'✍️ Напиши','gender-all':'🎯 Все типы'};
 var BDCLS={'mc-de':'bd1','mc-ru':'bd2','audio':'bd3','letter':'bd4','all':'bd1','conj-word':'bd4','conj-phrase':'bd2','conj-write':'bd3','conj-all':'bd1','gender-mc':'bd2','gender-letter':'bd4','gender-write':'bd3','gender-all':'bd1'};
-var selConjMode = 'conj-word';
+var selConjMode   = 'conj-word';
 var selGenderMode = 'gender-mc';
+var selGenderPack = 0;
 
 function getPool(){
   return selChapter===0 ? WORDS : WORDS.filter(function(w){ return w.chNum===selChapter; });
@@ -2626,9 +2630,11 @@ function recGender(key, isErr){
 }
 function genderSeen(de){ return GENDER_ST[de] && GENDER_ST[de].a > 0; }
 function genderErrs(de){ return GENDER_ST[de] ? GENDER_ST[de].e : 0; }
+function curPackWords(){ return GENDER_PACKS[selGenderPack].words; }
 function unseenFirstGender(){
-  var unseen = GENDER_WORDS.filter(function(w){ return !genderSeen(w.de); });
-  var seen   = GENDER_WORDS.filter(function(w){ return  genderSeen(w.de); });
+  var words = curPackWords();
+  var unseen = words.filter(function(w){ return !genderSeen(w.de); });
+  var seen   = words.filter(function(w){ return  genderSeen(w.de); });
   if(unseen.length > 0) return unseen.slice().sort(function(){ return Math.random()-.5; });
   return seen.slice().sort(function(a,b){ return genderErrs(b.de)-genderErrs(a.de)+(Math.random()-.5); });
 }
@@ -2636,40 +2642,58 @@ function buildGenderQuestions(mode, count){
   count = count||15;
   var pool = unseenFirstGender();
   var taken = pool.slice(0, Math.min(count, pool.length));
-  if(mode==='gender-mc'){
-    return taken.map(function(w){
-      return {w:{de:w.art, ru:w.de, hint:w.ru, art:w.art, origDe:w.de, speakText:w.art+' '+w.de, globalIdx:null}, m:'gender-mc'};
-    });
-  } else if(mode==='gender-letter'){
-    return taken.map(function(w){
-      return {w:{de:w.art+' '+w.de, ru:w.ru, art:w.art, origDe:w.de, speakText:w.art+' '+w.de, globalIdx:null}, m:'gender-letter'};
-    });
-  } else if(mode==='gender-write'){
-    return taken.map(function(w){
-      return {w:{de:w.art+' '+w.de, ru:w.ru, art:w.art, origDe:w.de, speakText:w.art+' '+w.de, globalIdx:null}, m:'gender-write'};
-    });
-  } else { // gender-all
-    var modes=['gender-mc','gender-letter','gender-write'];
-    return taken.map(function(w){
-      var m=modes[Math.floor(Math.random()*3)];
-      var isMC=(m==='gender-mc');
-      return {w:{de:isMC?w.art:w.art+' '+w.de, ru:isMC?w.de:w.ru, hint:isMC?w.ru:'', art:w.art, origDe:w.de, speakText:w.art+' '+w.de, globalIdx:null}, m:m};
-    });
+  function toQ(w, m){
+    var isMC=(m==='gender-mc');
+    return {w:{de:isMC?w.art:w.art+' '+w.de, ru:isMC?w.de:w.ru, hint:isMC?w.ru:'', art:w.art, origDe:w.de, speakText:w.art+' '+w.de, globalIdx:null}, m:m};
   }
+  if(mode==='gender-all'){
+    var modes=['gender-mc','gender-letter','gender-write'];
+    return taken.map(function(w){ return toQ(w, modes[Math.floor(Math.random()*3)]); });
+  }
+  return taken.map(function(w){ return toQ(w, mode); });
+}
+function buildGenderPackGrid(){
+  var grid = document.getElementById('gender-pack-grid');
+  grid.innerHTML = '';
+  GENDER_PACKS.forEach(function(pack, idx){
+    var words = pack.words;
+    var seen = words.filter(function(w){ return genderSeen(w.de); }).length;
+    var total = words.length, left = total-seen;
+    var pct = total ? Math.round(seen/total*100) : 0;
+    var r=14, circ=2*Math.PI*r, dash=circ*pct/100;
+    var metaStr = seen+'/'+total+' изучено';
+    if(left>0) metaStr += ' · <span style="color:#5ee8a0;font-weight:600">'+left+' новых</span>';
+    var card = document.createElement('div');
+    card.className = 'ch-card'+(selGenderPack===idx?' selected':'');
+    card.innerHTML =
+      '<div class="ch-num" style="font-size:11px">'+pack.num+'</div>'+
+      '<div class="ch-info"><div class="ch-name">'+pack.name+'</div><div class="ch-meta">'+metaStr+'</div></div>'+
+      '<div class="ch-prog"><svg width="32" height="32" viewBox="0 0 32 32">'+
+        '<circle cx="16" cy="16" r="'+r+'" fill="none" stroke="#2e2e3e" stroke-width="3"/>'+
+        '<circle cx="16" cy="16" r="'+r+'" fill="none" stroke="#5ee8a0" stroke-width="3" stroke-dasharray="'+dash+' '+(circ-dash)+'" stroke-linecap="round"/>'+
+      '</svg></div>';
+    card.onclick=(function(i){ return function(){
+      selGenderPack=i;
+      document.querySelectorAll('#gender-pack-grid .ch-card').forEach(function(c){ c.classList.remove('selected'); });
+      card.classList.add('selected');
+      updateGenderProgress();
+    }; })(idx);
+    grid.appendChild(card);
+  });
 }
 function updateGenderProgress(){
-  var total=GENDER_WORDS.length;
-  var seen=GENDER_WORDS.filter(function(w){ return genderSeen(w.de); }).length;
-  var left=total-seen, pct=Math.round(seen/total*100);
+  var words = curPackWords();
+  var total=words.length, seen=words.filter(function(w){ return genderSeen(w.de); }).length;
+  var left=total-seen, pct=total?Math.round(seen/total*100):0;
   document.getElementById('gender-progress-block').innerHTML=
     '<div style="background:var(--s2);border:1px solid var(--brd);border-radius:12px;padding:12px 16px">'+
-    '<div style="font-size:10px;color:#5a5a78;margin-bottom:4px;font-family:Syne,sans-serif;font-weight:700">⚥ СУЩЕСТВИТЕЛЬНЫЕ</div>'+
+    '<div style="font-size:10px;color:#5a5a78;margin-bottom:4px;font-family:Syne,sans-serif;font-weight:700">⚥ ПРОГРЕСС ПАКЕТА</div>'+
     '<div style="font-size:18px;font-weight:800;font-family:Syne,sans-serif;line-height:1;margin-bottom:6px">'+seen+'<span style="font-size:12px;font-weight:500;color:#5a5a78"> / '+total+'</span></div>'+
     '<div style="background:var(--s3);border-radius:4px;height:4px;overflow:hidden"><div style="background:var(--acc2);width:'+pct+'%;height:100%;border-radius:4px"></div></div>'+
     '<div style="font-size:11px;margin-top:5px;color:'+(left>0?'#5ee8a0':'var(--grn)')+'">'+( left>0?left+' новых':'Все пройдено ✓')+'</div>'+
     '</div>';
 }
-function showGenderStudy(){ showScreen('gender-study'); updateGenderProgress(); }
+function showGenderStudy(){ showScreen('gender-study'); buildGenderPackGrid(); updateGenderProgress(); }
 function pickGenderMode(m, el){
   selGenderMode = m;
   document.querySelectorAll('#gender-mode-grid .mode-card, #gender-study .mode-all .mode-card').forEach(function(c){ c.classList.remove('selected'); });
