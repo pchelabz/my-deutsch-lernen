@@ -278,13 +278,13 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
       <div class="mc-big-arr">›</div>
     </div>
 
-    <div class="menu-card disabled">
+    <div class="menu-card" onclick="showGenderStudy()">
       <div class="mc-big-icon">⚥</div>
       <div class="mc-big-info">
         <div class="mc-big-name">Учу род</div>
         <div class="mc-big-desc">der / die / das — угадай артикль</div>
       </div>
-      <div class="mc-soon">Скоро</div>
+      <div class="mc-big-arr">›</div>
     </div>
 
     <button class="btn btn-ghost" onclick="showStats()" style="margin-top:8px">📊 Статистика ошибок</button>
@@ -340,6 +340,30 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
   </div>
 </div>
 
+<!-- ===== GENDER STUDY ===== -->
+<div id="gender-study" class="screen">
+  <div class="shdr">
+    <button class="back-btn" onclick="goHome()">← Назад</button>
+    <div class="shdr-title">Учу род</div>
+  </div>
+  <div class="sbody">
+    <div class="modal-sub" style="margin-bottom:16px">der / die / das — артикли существительных. Выбери тип задания.</div>
+    <div id="gender-progress-block" style="margin-bottom:20px"></div>
+    <div class="sec-lbl">Тип задания</div>
+    <div class="mode-grid2" id="gender-mode-grid">
+      <div class="mode-card selected" onclick="pickGenderMode('gender-mc',this)"><div class="mc-icon">⚥</div><div class="mc-name">Угадай род</div><div class="mc-desc">Выбери артикль</div></div>
+      <div class="mode-card" onclick="pickGenderMode('gender-letter',this)"><div class="mc-icon">🔤</div><div class="mc-name">Составь слово</div><div class="mc-desc">Слово с артиклем из букв</div></div>
+    </div>
+    <div class="mode-all" style="margin-bottom:8px">
+      <div class="mode-card" onclick="pickGenderMode('gender-write',this)"><div class="mc-icon">✍️</div><div class="mc-name">Напиши слово</div><div class="mc-desc">Введи слово с артиклем</div></div>
+    </div>
+    <div class="mode-all">
+      <div class="mode-card" onclick="pickGenderMode('gender-all',this)"><div class="mc-icon">🎯</div><div class="mc-name">Все типы</div><div class="mc-desc">Смешанный — все 3 типа заданий</div></div>
+    </div>
+    <button class="btn btn-red" onclick="startGenderQuiz()">Начать</button>
+  </div>
+</div>
+
 <!-- ===== ADD WORDS ===-->
 <div id="add-words" class="screen">
   <div class="shdr">
@@ -374,7 +398,7 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
 <!-- ===== QUIZ ===== -->
 <div id="quiz" class="screen">
   <div class="qhdr">
-    <button class="back-btn" onclick="curChNum===-1?showConjStudy():showVocabStudy()">← Назад</button>
+    <button class="back-btn" onclick="curChNum===-1?showConjStudy():curChNum===-2?showGenderStudy():showVocabStudy()">← Назад</button>
     <div class="prog-wrap">
       <div class="prog-lbl"><span id="qcur">1</span> / <span id="qtot">20</span><span id="qsc">✓ 0</span></div>
       <div class="prog-bar"><div class="prog-fill" id="pfill" style="width:0%"></div></div>
@@ -2054,6 +2078,14 @@ var CONJ_PHRASES = [
   {de:"ich mache aus",ru:"я выключаю"},{de:"du machst aus",ru:"ты выключаешь"},{de:"er/sie/es macht aus",ru:"он/она/оно выключает"},{de:"wir machen aus",ru:"мы выключаем"},{de:"ihr macht aus",ru:"вы выключаете"},{de:"sie/Sie machen aus",ru:"они/Вы выключают/выключаете"},
 ];
 
+// ==================== GENDER DATA ====================
+var GENDER_WORDS = [
+  {de:"Hochzeit", ru:"свадьба",    art:"die"},
+  {de:"Wetter",   ru:"погода",     art:"das"},
+  {de:"Regen",    ru:"дождь",      art:"der"},
+  {de:"Feuerzeug",ru:"зажигалка",  art:"das"},
+];
+
 // ==================== STATE ====================
 var selChapter = 0; // 0 = all, else chapter num
 var selMode = 'mc-de';
@@ -2062,7 +2094,8 @@ var qs=[], qi=0, score=0, errs=0, answered=false;
 var t0=null, curW=null, curQMode='', curAns='';
 var placed=[], curStatFilter='all';
 var ST = JSON.parse(localStorage.getItem('de-st2')||'{}');
-var CONJ_ST = JSON.parse(localStorage.getItem('de-conj-st')||'{}');
+var CONJ_ST   = JSON.parse(localStorage.getItem('de-conj-st')||'{}');
+var GENDER_ST = JSON.parse(localStorage.getItem('de-gender-st')||'{}');
 var gasUrl = localStorage.getItem('de-gas-url')||'';
 
 // ==================== CHAPTER UI ====================
@@ -2276,9 +2309,10 @@ function showVocabStudy(){
 
 // ==================== QUIZ LOGIC ====================
 var MODES=['mc-de','mc-ru','audio','letter'];
-var ML={'mc-de':'🇩🇪 DE','mc-ru':'🇷🇺 RU','audio':'🔊 Слух','letter':'🔤 Буквы','all':'🎯 Микс','conj-word':'🔤 Слово','conj-phrase':'📝 Фраза','conj-write':'✍️ Напиши','conj-all':'🎯 Все типы'};
-var BDCLS={'mc-de':'bd1','mc-ru':'bd2','audio':'bd3','letter':'bd4','all':'bd1','conj-word':'bd4','conj-phrase':'bd2','conj-write':'bd3','conj-all':'bd1'};
+var ML={'mc-de':'🇩🇪 DE','mc-ru':'🇷🇺 RU','audio':'🔊 Слух','letter':'🔤 Буквы','all':'🎯 Микс','conj-word':'🔤 Слово','conj-phrase':'📝 Фраза','conj-write':'✍️ Напиши','conj-all':'🎯 Все типы','gender-mc':'⚥ Род','gender-letter':'🔤 Слово','gender-write':'✍️ Напиши','gender-all':'🎯 Все типы'};
+var BDCLS={'mc-de':'bd1','mc-ru':'bd2','audio':'bd3','letter':'bd4','all':'bd1','conj-word':'bd4','conj-phrase':'bd2','conj-write':'bd3','conj-all':'bd1','gender-mc':'bd2','gender-letter':'bd4','gender-write':'bd3','gender-all':'bd1'};
 var selConjMode = 'conj-word';
+var selGenderMode = 'gender-mc';
 
 function getPool(){
   return selChapter===0 ? WORDS : WORDS.filter(function(w){ return w.chNum===selChapter; });
@@ -2382,6 +2416,28 @@ function renderQ(){
     document.getElementById('opts').style.display='none';
     document.getElementById('write-area').style.display='block';
     setTimeout(function(){ document.getElementById('write-input').focus(); }, 100);
+  } else if(m==='gender-mc'){
+    document.getElementById('qtype').textContent='УГАДАЙ АРТИКЛЬ';
+    document.getElementById('qword').textContent=w.ru; // German noun without article
+    document.getElementById('qhint').textContent=w.hint||'';
+    document.getElementById('opts').style.display='grid';
+    document.getElementById('opts').innerHTML=['der','die','das','die (мн.ч.)'].map(function(a){
+      return '<button class="opt" onclick="checkGenderMC(\''+a+'\')">'+a+'</button>';
+    }).join('');
+  } else if(m==='gender-letter'){
+    document.getElementById('qtype').textContent='СОСТАВЬ СЛОВО С АРТИКЛЕМ';
+    document.getElementById('qword').textContent=w.ru;
+    document.getElementById('qhint').textContent='включая артикль';
+    document.getElementById('opts').style.display='none';
+    document.getElementById('letter-area').style.display='block';
+    initLetters(w.de);
+  } else if(m==='gender-write'){
+    document.getElementById('qtype').textContent='НАПИШИ СЛОВО С АРТИКЛЕМ';
+    document.getElementById('qword').textContent=w.ru;
+    document.getElementById('qhint').textContent='включая артикль';
+    document.getElementById('opts').style.display='none';
+    document.getElementById('write-area').style.display='block';
+    setTimeout(function(){ document.getElementById('write-input').focus(); }, 100);
   } else {
     document.getElementById('qtype').textContent='СОСТАВЬ СЛОВО ПО-НЕМЕЦКИ';
     document.getElementById('qword').textContent=w.ru;
@@ -2470,6 +2526,7 @@ function checkLetters(){
   document.getElementById('lans').className='lans '+(ok?'correct':'wrong');
   document.getElementById('chkbtn').disabled=true;
   if(curW.globalIdx!=null) rec(curW.globalIdx,curQMode,!ok);
+  else if(curQMode==='gender-letter') recGender(curW.origDe, !ok);
   else recConj(curW.de, !ok);
   if(ok){ score++; showFB(true,'Правильно! 🎉'); document.querySelectorAll('#lans .ltile').forEach(function(t){ t.classList.remove('placed'); t.classList.add('ok'); }); }
   else { errs++; showFB(false,'Неверно. Правильный ответ: '+correct); document.querySelectorAll('#lans .ltile').forEach(function(t){ t.classList.remove('placed'); t.classList.add('bad'); }); }
@@ -2478,7 +2535,7 @@ function checkLetters(){
 
 function showFB(ok,msg){
   var f=document.getElementById('fb'); f.textContent=msg; f.className='fb '+(ok?'correct':'wrong');
-  if(curW){ setTimeout(function(){ var u=new SpeechSynthesisUtterance(curW.de); u.lang='de-DE'; u.rate=0.85; speechSynthesis.cancel(); speechSynthesis.speak(u); }, 350); }
+  if(curW){ var txt=curW.speakText||curW.de; setTimeout(function(){ var u=new SpeechSynthesisUtterance(txt); u.lang='de-DE'; u.rate=0.85; speechSynthesis.cancel(); speechSynthesis.speak(u); }, 350); }
 }
 
 function nextQ(){
@@ -2559,6 +2616,90 @@ function buildConjQuestions(mode, count){
     return working.slice(0,count);
   }
 }
+// ==================== GENDER FUNCTIONS ====================
+function saveGenderST(){ localStorage.setItem('de-gender-st', JSON.stringify(GENDER_ST)); }
+function recGender(key, isErr){
+  if(!GENDER_ST[key]) GENDER_ST[key]={a:0,e:0};
+  GENDER_ST[key].a++;
+  if(isErr) GENDER_ST[key].e++;
+  saveGenderST();
+}
+function genderSeen(de){ return GENDER_ST[de] && GENDER_ST[de].a > 0; }
+function genderErrs(de){ return GENDER_ST[de] ? GENDER_ST[de].e : 0; }
+function unseenFirstGender(){
+  var unseen = GENDER_WORDS.filter(function(w){ return !genderSeen(w.de); });
+  var seen   = GENDER_WORDS.filter(function(w){ return  genderSeen(w.de); });
+  if(unseen.length > 0) return unseen.slice().sort(function(){ return Math.random()-.5; });
+  return seen.slice().sort(function(a,b){ return genderErrs(b.de)-genderErrs(a.de)+(Math.random()-.5); });
+}
+function buildGenderQuestions(mode, count){
+  count = count||15;
+  var pool = unseenFirstGender();
+  var taken = pool.slice(0, Math.min(count, pool.length));
+  if(mode==='gender-mc'){
+    return taken.map(function(w){
+      return {w:{de:w.art, ru:w.de, hint:w.ru, art:w.art, origDe:w.de, speakText:w.art+' '+w.de, globalIdx:null}, m:'gender-mc'};
+    });
+  } else if(mode==='gender-letter'){
+    return taken.map(function(w){
+      return {w:{de:w.art+' '+w.de, ru:w.ru, art:w.art, origDe:w.de, speakText:w.art+' '+w.de, globalIdx:null}, m:'gender-letter'};
+    });
+  } else if(mode==='gender-write'){
+    return taken.map(function(w){
+      return {w:{de:w.art+' '+w.de, ru:w.ru, art:w.art, origDe:w.de, speakText:w.art+' '+w.de, globalIdx:null}, m:'gender-write'};
+    });
+  } else { // gender-all
+    var modes=['gender-mc','gender-letter','gender-write'];
+    return taken.map(function(w){
+      var m=modes[Math.floor(Math.random()*3)];
+      var isMC=(m==='gender-mc');
+      return {w:{de:isMC?w.art:w.art+' '+w.de, ru:isMC?w.de:w.ru, hint:isMC?w.ru:'', art:w.art, origDe:w.de, speakText:w.art+' '+w.de, globalIdx:null}, m:m};
+    });
+  }
+}
+function updateGenderProgress(){
+  var total=GENDER_WORDS.length;
+  var seen=GENDER_WORDS.filter(function(w){ return genderSeen(w.de); }).length;
+  var left=total-seen, pct=Math.round(seen/total*100);
+  document.getElementById('gender-progress-block').innerHTML=
+    '<div style="background:var(--s2);border:1px solid var(--brd);border-radius:12px;padding:12px 16px">'+
+    '<div style="font-size:10px;color:#5a5a78;margin-bottom:4px;font-family:Syne,sans-serif;font-weight:700">⚥ СУЩЕСТВИТЕЛЬНЫЕ</div>'+
+    '<div style="font-size:18px;font-weight:800;font-family:Syne,sans-serif;line-height:1;margin-bottom:6px">'+seen+'<span style="font-size:12px;font-weight:500;color:#5a5a78"> / '+total+'</span></div>'+
+    '<div style="background:var(--s3);border-radius:4px;height:4px;overflow:hidden"><div style="background:var(--acc2);width:'+pct+'%;height:100%;border-radius:4px"></div></div>'+
+    '<div style="font-size:11px;margin-top:5px;color:'+(left>0?'#5ee8a0':'var(--grn)')+'">'+( left>0?left+' новых':'Все пройдено ✓')+'</div>'+
+    '</div>';
+}
+function showGenderStudy(){ showScreen('gender-study'); updateGenderProgress(); }
+function pickGenderMode(m, el){
+  selGenderMode = m;
+  document.querySelectorAll('#gender-mode-grid .mode-card, #gender-study .mode-all .mode-card').forEach(function(c){ c.classList.remove('selected'); });
+  el.classList.add('selected');
+}
+function startGenderQuiz(){
+  curMode = selGenderMode; curChNum = -2;
+  qs = buildGenderQuestions(selGenderMode, 15);
+  qi=0; score=0; errs=0; answered=false; t0=Date.now();
+  document.getElementById('qtot').textContent=qs.length;
+  var b=document.getElementById('qbadge');
+  b.textContent=ML[selGenderMode]||'⚥'; b.className='qbadge '+(BDCLS[selGenderMode]||'bd2');
+  showScreen('quiz');
+  renderQ();
+}
+function checkGenderMC(art){
+  if(answered) return; answered=true;
+  var correct=curW.art;
+  var ok=(art===correct);
+  document.querySelectorAll('#opts .opt').forEach(function(b){
+    b.disabled=true;
+    if(b.textContent===correct) b.style.background='rgba(94,232,160,.25)';
+    else if(b.textContent===art && !ok) b.style.background='rgba(255,80,80,.2)';
+  });
+  if(ok){ score++; showFB(true,'Правильно! 🎉 '+correct+' '+curW.ru); }
+  else { errs++; showFB(false,'Неверно. Правильный артикль: '+correct+' '+curW.ru); }
+  recGender(curW.origDe, !ok);
+  document.getElementById('nxtbtn').classList.add('show');
+}
+// ==================== /GENDER FUNCTIONS ====================
 function startConjQuiz(){
   curMode = selConjMode; curChNum = -1;
   qs = buildConjQuestions(selConjMode, 15);
@@ -2578,7 +2719,8 @@ function checkWrite(){
   document.getElementById('wrtbtn').disabled=true;
   if(ok){ score++; showFB(true,'Правильно! 🎉'); }
   else { errs++; showFB(false,'Неверно. Правильный ответ: '+correct); }
-  recConj(curW.de, !ok);
+  if(curQMode==='gender-write') recGender(curW.origDe, !ok);
+  else recConj(curW.de, !ok);
   document.getElementById('nxtbtn').classList.add('show');
 }
 
@@ -2591,7 +2733,7 @@ function showResults(){
   document.getElementById('rlbl').textContent=pct>=80?'Отлично!':pct>=50?'Хороший результат!':'Нужно повторить!';
   document.getElementById('rright').textContent=score;
   document.getElementById('rwrong').textContent=errs;
-  document.getElementById('rchap').textContent=curChNum===-1?'🔄 Спряжения':curChNum===0?'Все главы':'Kapitel '+curChNum;
+  document.getElementById('rchap').textContent=curChNum===-1?'🔄 Спряжения':curChNum===-2?'⚥ Род':curChNum===0?'Все главы':'Kapitel '+curChNum;
   document.getElementById('rmode').textContent=ML[curMode];
   var el=Math.round((Date.now()-t0)/1000);
   document.getElementById('rtime').textContent=el<60?el+' сек':Math.floor(el/60)+' мин '+(el%60)+' сек';
