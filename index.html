@@ -460,28 +460,68 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
     <button class="back-btn" id="syncsb" onclick="doSync()" style="display:none;color:var(--acc3);border-color:rgba(79,195,247,.3)">↑ Sync</button>
   </div>
   <div class="sbody">
-    <div class="scards">
-      <div class="scard"><div class="n" id="st-tot" style="color:var(--acc3)">0</div><div class="l">Попыток</div></div>
-      <div class="scard"><div class="n" id="st-ok" style="color:var(--grn)">0</div><div class="l">Правильно</div></div>
-      <div class="scard"><div class="n" id="st-err" style="color:var(--acc)">0</div><div class="l">Ошибок</div></div>
+    <!-- Section tabs -->
+    <div class="ftabs" style="margin-bottom:16px">
+      <div class="ftab active" id="stab-vocab"  onclick="sSection('vocab',this)">📚 Слова</div>
+      <div class="ftab"        id="stab-conj"   onclick="sSection('conj',this)">🔄 Спряжения</div>
+      <div class="ftab"        id="stab-gender" onclick="sSection('gender',this)">⚥ Род</div>
     </div>
-    <div class="sec-lbl" style="margin-bottom:10px">По типам заданий</div>
-    <div class="scards" style="margin-bottom:20px">
-      <div class="scard"><div class="n" id="sm-de" style="color:var(--acc3)">0</div><div class="l">🇩🇪 DE</div></div>
-      <div class="scard"><div class="n" id="sm-ru" style="color:var(--acc2)">0</div><div class="l">🇷🇺 RU</div></div>
-      <div class="scard"><div class="n" id="sm-au" style="color:var(--grn)">0</div><div class="l">🔊 Слух</div></div>
-      <div class="scard" style="grid-column:1/-1"><div class="n" id="sm-lt" style="color:var(--acc)">0</div><div class="l">🔤 Буквы</div></div>
+
+    <!-- ── VOCAB section ── -->
+    <div id="stsec-vocab">
+      <div class="scards">
+        <div class="scard"><div class="n" id="st-tot" style="color:var(--acc3)">0</div><div class="l">Попыток</div></div>
+        <div class="scard"><div class="n" id="st-ok"  style="color:var(--grn)">0</div><div class="l">Правильно</div></div>
+        <div class="scard"><div class="n" id="st-err" style="color:var(--acc)">0</div><div class="l">Ошибок</div></div>
+      </div>
+      <div class="sec-lbl" style="margin-bottom:10px">По типам заданий</div>
+      <div class="scards" style="margin-bottom:20px">
+        <div class="scard"><div class="n" id="sm-de" style="color:var(--acc3)">0</div><div class="l">🇩🇪 DE</div></div>
+        <div class="scard"><div class="n" id="sm-ru" style="color:var(--acc2)">0</div><div class="l">🇷🇺 RU</div></div>
+        <div class="scard"><div class="n" id="sm-au" style="color:var(--grn)">0</div><div class="l">🔊 Слух</div></div>
+        <div class="scard" style="grid-column:1/-1"><div class="n" id="sm-lt" style="color:var(--acc)">0</div><div class="l">🔤 Буквы</div></div>
+      </div>
+      <div class="sec-lbl" style="margin-bottom:10px">Слова</div>
+      <div class="ftabs">
+        <div class="ftab active" onclick="sflt('all',this)">Все</div>
+        <div class="ftab" onclick="sflt('errors',this)">Только ошибки</div>
+        <div class="ftab" onclick="sflt('mc-de',this)">🇩🇪</div>
+        <div class="ftab" onclick="sflt('mc-ru',this)">🇷🇺</div>
+        <div class="ftab" onclick="sflt('audio',this)">🔊</div>
+        <div class="ftab" onclick="sflt('letter',this)">🔤</div>
+      </div>
+      <div class="wlist" id="wlist"></div>
     </div>
-    <div class="sec-lbl" style="margin-bottom:10px">Слова</div>
-    <div class="ftabs">
-      <div class="ftab active" onclick="sflt('all',this)">Все</div>
-      <div class="ftab" onclick="sflt('errors',this)">Только ошибки</div>
-      <div class="ftab" onclick="sflt('mc-de',this)">🇩🇪</div>
-      <div class="ftab" onclick="sflt('mc-ru',this)">🇷🇺</div>
-      <div class="ftab" onclick="sflt('audio',this)">🔊</div>
-      <div class="ftab" onclick="sflt('letter',this)">🔤</div>
+
+    <!-- ── CONJ section ── -->
+    <div id="stsec-conj" style="display:none">
+      <div class="scards" style="margin-bottom:16px">
+        <div class="scard"><div class="n" id="cst-tot" style="color:var(--acc3)">0</div><div class="l">Попыток</div></div>
+        <div class="scard"><div class="n" id="cst-ok"  style="color:var(--grn)">0</div><div class="l">Правильно</div></div>
+        <div class="scard"><div class="n" id="cst-err" style="color:var(--acc)">0</div><div class="l">Ошибок</div></div>
+      </div>
+      <div class="ftabs" style="margin-bottom:4px">
+        <div class="ftab active" id="csflt-all"    onclick="csflt('all',this)">Все</div>
+        <div class="ftab"        id="csflt-errors" onclick="csflt('errors',this)">Только ошибки</div>
+        <div class="ftab"        id="csflt-words"  onclick="csflt('words',this)">🔤 Инфинитивы</div>
+        <div class="ftab"        id="csflt-phrases" onclick="csflt('phrases',this)">📝 Формы</div>
+      </div>
+      <div class="wlist" id="conj-wlist"></div>
     </div>
-    <div class="wlist" id="wlist"></div>
+
+    <!-- ── GENDER section ── -->
+    <div id="stsec-gender" style="display:none">
+      <div class="scards" style="margin-bottom:16px">
+        <div class="scard"><div class="n" id="gst-tot" style="color:var(--acc3)">0</div><div class="l">Попыток</div></div>
+        <div class="scard"><div class="n" id="gst-ok"  style="color:var(--grn)">0</div><div class="l">Правильно</div></div>
+        <div class="scard"><div class="n" id="gst-err" style="color:var(--acc)">0</div><div class="l">Ошибок</div></div>
+      </div>
+      <div class="ftabs" style="margin-bottom:4px">
+        <div class="ftab active" id="gsflt-all"    onclick="gsflt('all',this)">Все</div>
+        <div class="ftab"        id="gsflt-errors" onclick="gsflt('errors',this)">Только ошибки</div>
+      </div>
+      <div class="wlist" id="gender-wlist"></div>
+    </div>
   </div>
 </div>
 
@@ -2095,7 +2135,7 @@ var selMode = 'mc-de';
 var curMode = 'mc-de', curChNum = 0;
 var qs=[], qi=0, score=0, errs=0, answered=false;
 var t0=null, curW=null, curQMode='', curAns='';
-var placed=[], curStatFilter='all';
+var placed=[], curStatFilter='all', curStatSection='vocab', curConjFilter='all', curGenderFilter='all';
 var ST = JSON.parse(localStorage.getItem('de-st2')||'{}');
 var CONJ_ST   = JSON.parse(localStorage.getItem('de-conj-st')||'{}');
 var GENDER_ST = JSON.parse(localStorage.getItem('de-gender-st')||'{}');
@@ -2768,6 +2808,7 @@ function showResults(){
 
 // ==================== STATS PAGE ====================
 function showStats(){
+  // ── vocab summary ──
   var tot=0,ok=0,te=0,bm={'mc-de':0,'mc-ru':0,'audio':0,'letter':0};
   Object.values(ST).forEach(function(ms){
     Object.entries(ms).forEach(function(x){
@@ -2783,37 +2824,126 @@ function showStats(){
   document.getElementById('sm-au').textContent=bm['audio'];
   document.getElementById('sm-lt').textContent=bm['letter'];
   document.getElementById('syncsb').style.display=gasUrl?'block':'none';
+  // ── conj summary ──
+  var ctot=0,cok=0,cte=0;
+  Object.values(CONJ_ST).forEach(function(d){ ctot+=d.a; cok+=d.a-d.e; cte+=d.e; });
+  document.getElementById('cst-tot').textContent=ctot;
+  document.getElementById('cst-ok').textContent=cok;
+  document.getElementById('cst-err').textContent=cte;
+  // ── gender summary ──
+  var gtot=0,gok=0,gte=0;
+  Object.values(GENDER_ST).forEach(function(d){ gtot+=d.a; gok+=d.a-d.e; gte+=d.e; });
+  document.getElementById('gst-tot').textContent=gtot;
+  document.getElementById('gst-ok').textContent=gok;
+  document.getElementById('gst-err').textContent=gte;
   renderWList(curStatFilter);
+  renderConjStatList(curConjFilter);
+  renderGenderStatList(curGenderFilter);
   showScreen('stats-page');
+}
+
+function sSection(s, el){
+  curStatSection = s;
+  document.querySelectorAll('#stats-page .shdr~.sbody>.ftabs .ftab').forEach(function(t){ t.classList.remove('active'); });
+  el.classList.add('active');
+  document.getElementById('stsec-vocab').style.display  = s==='vocab'  ? '' : 'none';
+  document.getElementById('stsec-conj').style.display   = s==='conj'   ? '' : 'none';
+  document.getElementById('stsec-gender').style.display = s==='gender' ? '' : 'none';
 }
 
 function sflt(f,el){
   curStatFilter=f;
-  document.querySelectorAll('.ftab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('#stsec-vocab .ftabs .ftab').forEach(function(t){ t.classList.remove('active'); });
   el.classList.add('active');
   renderWList(f);
+}
+function csflt(f,el){
+  curConjFilter=f;
+  document.querySelectorAll('#stsec-conj .ftabs .ftab').forEach(function(t){ t.classList.remove('active'); });
+  el.classList.add('active');
+  renderConjStatList(f);
+}
+function gsflt(f,el){
+  curGenderFilter=f;
+  document.querySelectorAll('#stsec-gender .ftabs .ftab').forEach(function(t){ t.classList.remove('active'); });
+  el.classList.add('active');
+  renderGenderStatList(f);
+}
+
+function errBadge(te,ta){
+  var ec=te===0?'e0':te<=2?'e1':'e2';
+  return '<div class="werr '+ec+'">'+(te>0?te:ta>0?'✓':'—')+'</div>';
 }
 
 function renderWList(f){
   var list=document.getElementById('wlist'); list.innerHTML='';
-  WORDS.forEach(function(w){
+  var rows=WORDS.slice().sort(function(a,b){
+    var ea=totalErrs(a.globalIdx), eb=totalErrs(b.globalIdx);
+    return eb-ea;
+  });
+  rows.forEach(function(w){
     var ws=ST[w.globalIdx]||{};
-    var te=Object.values(ws).reduce(function(s,m){ return s+m.e; },0);
-    var ta=Object.values(ws).reduce(function(s,m){ return s+m.a; },0);
+    var te=totalErrs(w.globalIdx), ta=totalAttempts(w.globalIdx);
     if(f==='errors'&&te===0) return;
     if(['mc-de','mc-ru','audio','letter'].indexOf(f)>=0&&(!ws[f]||ws[f].a===0)) return;
     var row=document.createElement('div'); row.className='wrow';
-    var ec=te===0?'e0':te<=2?'e1':'e2';
     var ics={'mc-de':'🇩🇪','mc-ru':'🇷🇺','audio':'🔊','letter':'🔤'};
     var cls={'mc-de':'t1','mc-ru':'t2','audio':'t3','letter':'t4'};
     var badges=MODES.map(function(m){
       var d=ws[m]; if(!d||!d.a) return '';
       return '<span class="wtb '+cls[m]+'">'+ics[m]+' '+d.e+'/'+d.a+'</span>';
     }).join('');
-    row.innerHTML='<div><div class="wde">'+w.de+'</div><div class="wtypes" style="margin-top:3px">'+(badges||'<span style="color:#44445a;font-size:9px">не изучалось</span>')+'</div></div><div class="wru">'+w.ru+'</div><div class="werr '+ec+'">'+(te>0?te:ta>0?'✓':'—')+'</div>';
+    row.innerHTML='<div><div class="wde">'+w.de+'</div><div class="wtypes" style="margin-top:3px">'+(badges||'<span style="color:#44445a;font-size:9px">не изучалось</span>')+'</div></div><div class="wru">'+w.ru+'</div>'+errBadge(te,ta);
     list.appendChild(row);
   });
   if(!list.innerHTML) list.innerHTML='<div style="color:#44445a;text-align:center;padding:28px;font-size:13px">Нет данных</div>';
+}
+
+function renderConjStatList(f){
+  var list=document.getElementById('conj-wlist'); list.innerHTML='';
+  var items=[];
+  // words
+  CONJ_WORDS.forEach(function(w){
+    var d=CONJ_ST[w.de]; if(!d) return;
+    items.push({de:w.de, ru:w.ru, a:d.a, e:d.e, type:'word'});
+  });
+  // phrases
+  CONJ_PHRASES.forEach(function(p){
+    var d=CONJ_ST[p.de]; if(!d) return;
+    items.push({de:p.de, ru:p.ru, a:d.a, e:d.e, type:'phrase'});
+  });
+  items.sort(function(a,b){ return b.e-a.e; });
+  items.forEach(function(it){
+    if(f==='errors'&&it.e===0) return;
+    if(f==='words'&&it.type!=='word') return;
+    if(f==='phrases'&&it.type!=='phrase') return;
+    var row=document.createElement('div'); row.className='wrow';
+    var tag=it.type==='word'
+      ? '<span class="wtb t4" style="font-size:9px">🔤</span>'
+      : '<span class="wtb t2" style="font-size:9px">📝</span>';
+    row.innerHTML='<div><div class="wde">'+it.de+'</div><div class="wtypes" style="margin-top:3px">'+tag+' '+it.e+' ош. / '+it.a+' попыток</div></div><div class="wru">'+it.ru+'</div>'+errBadge(it.e,it.a);
+    list.appendChild(row);
+  });
+  if(!list.innerHTML) list.innerHTML='<div style="color:#44445a;text-align:center;padding:28px;font-size:13px">Нет данных — начни тренировку!</div>';
+}
+
+function renderGenderStatList(f){
+  var list=document.getElementById('gender-wlist'); list.innerHTML='';
+  var allWords=[];
+  GENDER_PACKS.forEach(function(pack){
+    pack.words.forEach(function(w){ allWords.push({word:w, packName:pack.name}); });
+  });
+  var items=allWords.map(function(x){
+    var d=GENDER_ST[x.word.de]||{a:0,e:0};
+    return {de:x.word.art+' '+x.word.de, ru:x.word.ru, pack:x.packName, a:d.a, e:d.e};
+  }).filter(function(it){ return it.a>0; }).sort(function(a,b){ return b.e-a.e; });
+  items.forEach(function(it){
+    if(f==='errors'&&it.e===0) return;
+    var row=document.createElement('div'); row.className='wrow';
+    row.innerHTML='<div><div class="wde">'+it.de+'</div><div class="wtypes" style="margin-top:3px"><span style="color:#5a5a78;font-size:10px">'+it.pack+' · '+it.e+' ош. / '+it.a+' попыток</span></div></div><div class="wru">'+it.ru+'</div>'+errBadge(it.e,it.a);
+    list.appendChild(row);
+  });
+  if(!list.innerHTML) list.innerHTML='<div style="color:#44445a;text-align:center;padding:28px;font-size:13px">Нет данных — начни тренировку!</div>';
 }
 
 // ==================== MY WORDS ====================
