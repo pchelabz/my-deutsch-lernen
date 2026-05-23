@@ -419,12 +419,16 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
     <div class="opts" id="opts"></div>
     <div id="letter-area" style="display:none">
       <div class="ahint">Нажимай буквы чтобы составить слово</div>
+      <div id="letter-pronoun" style="display:none;font-weight:800;font-size:22px;font-family:Syne,sans-serif;color:var(--acc3);margin-bottom:6px"></div>
       <div class="lans" id="lans"></div>
       <div class="lpool" id="lpool"></div>
       <button class="btn btn-red" id="chkbtn" onclick="checkLetters()" disabled style="margin-bottom:10px">Проверить</button>
     </div>
     <div id="write-area" class="write-area" style="display:none">
-      <input class="ifield" id="write-input" type="text" placeholder="Напиши фразу по-немецки…" onkeydown="if(event.key==='Enter'&&!answered)checkWrite()">
+      <div style="display:flex;align-items:center;gap:10px;width:100%">
+        <span id="write-pronoun" style="display:none;font-weight:800;font-size:22px;font-family:Syne,sans-serif;color:var(--acc3);white-space:nowrap"></span>
+        <input class="ifield" id="write-input" type="text" placeholder="Напиши фразу по-немецки…" onkeydown="if(event.key==='Enter'&&!answered)checkWrite()" style="flex:1;min-width:0">
+      </div>
       <button class="btn btn-red" id="wrtbtn" onclick="checkWrite()">Проверить</button>
     </div>
     <div class="fb" id="fb"></div>
@@ -2432,9 +2436,12 @@ function renderQ(){
   document.getElementById('write-area').style.display='none';
   document.getElementById('write-input').value='';
   document.getElementById('write-input').disabled=false;
+  document.getElementById('write-input').placeholder='Напиши фразу по-немецки…';
   document.getElementById('wrtbtn').disabled=false;
   document.getElementById('fb').className='fb';
   document.getElementById('nxtbtn').className='nxt';
+  document.getElementById('letter-pronoun').style.display='none';
+  document.getElementById('write-pronoun').style.display='none';
   var m=q.m;
   if(m==='mc-ru'){
     document.getElementById('qtype').textContent='ПЕРЕВЕДИ НА РУССКИЙ';
@@ -2466,13 +2473,20 @@ function renderQ(){
     document.getElementById('qhint').textContent='';
     document.getElementById('opts').style.display='none';
     document.getElementById('letter-area').style.display='block';
-    initLetters(w.de);
+    var _cp=w.de.indexOf(' '); curW.pronoun=w.de.slice(0,_cp); curW.verbForm=w.de.slice(_cp+1);
+    document.getElementById('letter-pronoun').textContent=curW.pronoun;
+    document.getElementById('letter-pronoun').style.display='block';
+    initLetters(curW.verbForm);
   } else if(m==='conj-write'){
     document.getElementById('qtype').textContent='НАПИШИ ФРАЗУ ПО-НЕМЕЦКИ';
     document.getElementById('qword').textContent=w.ru;
     document.getElementById('qhint').textContent='';
     document.getElementById('opts').style.display='none';
     document.getElementById('write-area').style.display='block';
+    var _cw=w.de.indexOf(' '); curW.pronoun=w.de.slice(0,_cw); curW.verbForm=w.de.slice(_cw+1);
+    document.getElementById('write-pronoun').textContent=curW.pronoun;
+    document.getElementById('write-pronoun').style.display='inline';
+    document.getElementById('write-input').placeholder='форму глагола…';
     setTimeout(function(){ document.getElementById('write-input').focus(); }, 100);
   } else if(m==='gender-mc'){
     document.getElementById('qtype').textContent='УГАДАЙ АРТИКЛЬ';
@@ -2578,7 +2592,7 @@ function retL(tile,te){
 }
 function checkLetters(){
   if(answered) return; answered=true;
-  var correct=curW.de;
+  var correct = curW.verbForm !== undefined ? curW.verbForm : curW.de;
   var base=function(s){ return s.replace(/^(der|die|das|ein|eine)\s+/i,'').trim().toLowerCase(); };
   var ok=base(curAns)===base(correct)||curAns.toLowerCase()===correct.toLowerCase();
   document.getElementById('lans').className='lans '+(ok?'correct':'wrong');
@@ -2587,7 +2601,7 @@ function checkLetters(){
   else if(curQMode==='gender-letter') recGender(curW.origDe, !ok);
   else recConj(curW.de, !ok);
   if(ok){ score++; showFB(true,'Правильно! 🎉'); document.querySelectorAll('#lans .ltile').forEach(function(t){ t.classList.remove('placed'); t.classList.add('ok'); }); }
-  else { errs++; showFB(false,'Неверно. Правильный ответ: '+correct); document.querySelectorAll('#lans .ltile').forEach(function(t){ t.classList.remove('placed'); t.classList.add('bad'); }); }
+  else { errs++; showFB(false,'Неверно. Правильный ответ: '+curW.de); document.querySelectorAll('#lans .ltile').forEach(function(t){ t.classList.remove('placed'); t.classList.add('bad'); }); }
   document.getElementById('nxtbtn').classList.add('show');
 }
 
@@ -2798,13 +2812,13 @@ function startConjQuiz(){
 }
 function checkWrite(){
   if(answered) return; answered=true;
-  var correct=curW.de;
+  var correct = curW.verbForm !== undefined ? curW.verbForm : curW.de;
   var input=document.getElementById('write-input').value.trim();
   var ok=input.toLowerCase()===correct.toLowerCase();
   document.getElementById('write-input').disabled=true;
   document.getElementById('wrtbtn').disabled=true;
   if(ok){ score++; showFB(true,'Правильно! 🎉'); }
-  else { errs++; showFB(false,'Неверно. Правильный ответ: '+correct); }
+  else { errs++; showFB(false,'Неверно. Правильный ответ: '+curW.de); }
   if(curQMode==='gender-write') recGender(curW.origDe, !ok);
   else recConj(curW.de, !ok);
   document.getElementById('nxtbtn').classList.add('show');
