@@ -287,6 +287,15 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
       <div class="mc-big-arr">›</div>
     </div>
 
+    <div class="menu-card" onclick="showPastStudy()">
+      <div class="mc-big-icon">⏮</div>
+      <div class="mc-big-info">
+        <div class="mc-big-name">Учу прошедшее</div>
+        <div class="mc-big-desc">Partizip II сильных глаголов</div>
+      </div>
+      <div class="mc-big-arr">›</div>
+    </div>
+
     <button class="btn btn-ghost" onclick="showStats()" style="margin-top:8px">📊 Статистика ошибок</button>
     <button class="btn btn-ghost" onclick="showAddWords()">✏️ Мои слова</button>
   </div>
@@ -365,6 +374,30 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
   </div>
 </div>
 
+<!-- ===== PAST STUDY ===== -->
+<div id="past-study" class="screen">
+  <div class="shdr">
+    <button class="back-btn" onclick="goHome()">← Назад</button>
+    <div class="shdr-title">Учу прошедшее</div>
+  </div>
+  <div class="sbody">
+    <div class="modal-sub" style="margin-bottom:16px">Partizip II сильных глаголов. Выбери тип задания.</div>
+    <div id="past-progress-card" style="background:var(--s2);border:1px solid var(--brd);border-radius:12px;padding:14px 16px;margin-bottom:20px"></div>
+    <div class="sec-lbl">Тип задания</div>
+    <div class="mode-grid2" id="past-mode-grid">
+      <div class="mode-card selected" onclick="pickPastMode('past-write',this)"><div class="mc-icon">✍️</div><div class="mc-name">Напиши</div><div class="mc-desc">Инфинитив → напиши Partizip II</div></div>
+      <div class="mode-card" onclick="pickPastMode('past-mc',this)"><div class="mc-icon">🔤</div><div class="mc-name">Выбери</div><div class="mc-desc">Перевод → выбери инфинитив</div></div>
+    </div>
+    <div class="mode-all" style="margin-bottom:8px">
+      <div class="mode-card" onclick="pickPastMode('past-letter',this)"><div class="mc-icon">🔡</div><div class="mc-name">Буквы</div><div class="mc-desc">Перевод → составь инфинитив и Partizip II</div></div>
+    </div>
+    <div class="mode-all">
+      <div class="mode-card" onclick="pickPastMode('past-all',this)"><div class="mc-icon">🎯</div><div class="mc-name">Все типы</div><div class="mc-desc">Смешанный — все 3 типа заданий</div></div>
+    </div>
+    <button class="btn btn-red" onclick="startPastQuiz()">Начать</button>
+  </div>
+</div>
+
 <!-- ===== ADD WORDS ===-->
 <div id="add-words" class="screen">
   <div class="shdr">
@@ -399,7 +432,7 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
 <!-- ===== QUIZ ===== -->
 <div id="quiz" class="screen">
   <div class="qhdr">
-    <button class="back-btn" onclick="curChNum===-1?showConjStudy():curChNum===-2?showGenderStudy():showVocabStudy()">← Назад</button>
+    <button class="back-btn" onclick="curChNum===-1?showConjStudy():curChNum===-2?showGenderStudy():curChNum===-3?showPastStudy():showVocabStudy()">← Назад</button>
     <div class="prog-wrap">
       <div class="prog-lbl"><span id="qcur">1</span> / <span id="qtot">20</span><span id="qsc">✓ 0</span></div>
       <div class="prog-bar"><div class="prog-fill" id="pfill" style="width:0%"></div></div>
@@ -469,6 +502,7 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
       <div class="ftab active" id="stab-vocab"  onclick="sSection('vocab',this)">📚 Слова</div>
       <div class="ftab"        id="stab-conj"   onclick="sSection('conj',this)">🔄 Спряжения</div>
       <div class="ftab"        id="stab-gender" onclick="sSection('gender',this)">⚥ Род</div>
+      <div class="ftab"        id="stab-past"   onclick="sSection('past',this)">⏮ Прошедшее</div>
     </div>
 
     <!-- ── VOCAB section ── -->
@@ -525,6 +559,20 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
         <div class="ftab"        id="gsflt-errors" onclick="gsflt('errors',this)">Только ошибки</div>
       </div>
       <div class="wlist" id="gender-wlist"></div>
+    </div>
+
+    <!-- ── PAST section ── -->
+    <div id="stsec-past" style="display:none">
+      <div class="scards" style="margin-bottom:16px">
+        <div class="scard"><div class="n" id="pst-tot" style="color:var(--acc3)">0</div><div class="l">Попыток</div></div>
+        <div class="scard"><div class="n" id="pst-ok"  style="color:var(--grn)">0</div><div class="l">Правильно</div></div>
+        <div class="scard"><div class="n" id="pst-err" style="color:var(--acc)">0</div><div class="l">Ошибок</div></div>
+      </div>
+      <div class="ftabs" style="margin-bottom:4px">
+        <div class="ftab active" id="psflt-all"    onclick="psflt('all',this)">Все</div>
+        <div class="ftab"        id="psflt-errors" onclick="psflt('errors',this)">Только ошибки</div>
+      </div>
+      <div class="wlist" id="past-wlist"></div>
     </div>
   </div>
 </div>
@@ -2206,16 +2254,113 @@ var GENDER_PACKS = [
   ]},
 ];
 
+// ==================== PAST VERBS ====================
+var PAST_VERBS = [
+  {inf:"bleiben",    infFull:"bleiben",            prat:"blieb",    part:"geblieben",   ru:"оставаться"},
+  {inf:"leihen",     infFull:"leihen",             prat:"lieh",     part:"geliehen",    ru:"давать/брать взаймы"},
+  {inf:"scheinen",   infFull:"scheinen",           prat:"schien",   part:"geschienen",  ru:"светить, казаться"},
+  {inf:"schneiden",  infFull:"schneiden",          prat:"schnitt",  part:"geschnitten", ru:"резать"},
+  {inf:"schreiben",  infFull:"schreiben",          prat:"schrieb",  part:"geschrieben", ru:"писать"},
+  {inf:"schreiten",  infFull:"schreiten",          prat:"schritt",  part:"geschritten", ru:"шагать"},
+  {inf:"schweigen",  infFull:"schweigen",          prat:"schwieg",  part:"geschwiegen", ru:"молчать"},
+  {inf:"steigen",    infFull:"steigen",            prat:"stieg",    part:"gestiegen",   ru:"подниматься"},
+  {inf:"streiten",   infFull:"streiten",           prat:"stritt",   part:"gestritten",  ru:"спорить"},
+  {inf:"treiben",    infFull:"treiben",            prat:"trieb",    part:"getrieben",   ru:"гнать"},
+  {inf:"verzeihen",  infFull:"verzeihen",          prat:"verzieh",  part:"verziehen",   ru:"извинять"},
+  {inf:"weisen",     infFull:"weisen",             prat:"wies",     part:"gewiesen",    ru:"указывать"},
+  {inf:"bieten",     infFull:"bieten",             prat:"bot",      part:"geboten",     ru:"предлагать"},
+  {inf:"fliegen",    infFull:"fliegen",            prat:"flog",     part:"geflogen",    ru:"летать"},
+  {inf:"frieren",    infFull:"frieren",            prat:"fror",     part:"gefroren",    ru:"мерзнуть"},
+  {inf:"riechen",    infFull:"riechen",            prat:"roch",     part:"gerochen",    ru:"нюхать; пахнуть"},
+  {inf:"schieben",   infFull:"schieben",           prat:"schob",    part:"geschoben",   ru:"двигать, толкать"},
+  {inf:"schließen",  infFull:"schließen",          prat:"schloss",  part:"geschlossen", ru:"закрывать"},
+  {inf:"verlieren",  infFull:"verlieren",          prat:"verlor",   part:"verloren",    ru:"терять"},
+  {inf:"wiegen",     infFull:"wiegen",             prat:"wog",      part:"gewogen",     ru:"взвешивать, весить"},
+  {inf:"ziehen",     infFull:"ziehen",             prat:"zog",      part:"gezogen",     ru:"тащить, тянуть"},
+  {inf:"heben",      infFull:"heben",              prat:"hob",      part:"gehoben",     ru:"поднимать"},
+  {inf:"lügen",      infFull:"lügen",              prat:"log",      part:"gelogen",     ru:"лгать"},
+  {inf:"binden",     infFull:"binden",             prat:"band",     part:"gebunden",    ru:"связывать, завязывать"},
+  {inf:"finden",     infFull:"finden",             prat:"fand",     part:"gefunden",    ru:"находить"},
+  {inf:"gelingen",   infFull:"gelingen",           prat:"gelang",   part:"gelungen",    ru:"удаваться"},
+  {inf:"klingen",    infFull:"klingen",            prat:"klang",    part:"geklungen",   ru:"звучать"},
+  {inf:"singen",     infFull:"singen",             prat:"sang",     part:"gesungen",    ru:"петь"},
+  {inf:"sinken",     infFull:"sinken",             prat:"sank",     part:"gesunken",    ru:"опускаться"},
+  {inf:"springen",   infFull:"springen",           prat:"sprang",   part:"gesprungen",  ru:"прыгать"},
+  {inf:"trinken",    infFull:"trinken",            prat:"trank",    part:"getrunken",   ru:"пить"},
+  {inf:"beginnen",   infFull:"beginnen",           prat:"begann",   part:"begonnen",    ru:"начинать"},
+  {inf:"gewinnen",   infFull:"gewinnen",           prat:"gewann",   part:"gewonnen",    ru:"побеждать"},
+  {inf:"schwimmen",  infFull:"schwimmen",          prat:"schwamm",  part:"geschwommen", ru:"плавать"},
+  {inf:"brechen",    infFull:"brechen / bricht",   prat:"brach",    part:"gebrochen",   ru:"ломать"},
+  {inf:"helfen",     infFull:"helfen / hilft",     prat:"half",     part:"geholfen",    ru:"помогать"},
+  {inf:"empfehlen",  infFull:"empfehlen / empfiehlt", prat:"empfahl", part:"empfohlen", ru:"рекомендовать"},
+  {inf:"nehmen",     infFull:"nehmen / nimmt",     prat:"nahm",     part:"genommen",    ru:"брать"},
+  {inf:"sprechen",   infFull:"sprechen / spricht", prat:"sprach",   part:"gesprochen",  ru:"говорить"},
+  {inf:"sterben",    infFull:"sterben / stirbt",   prat:"starb",    part:"gestorben",   ru:"умирать"},
+  {inf:"treffen",    infFull:"treffen / trifft",   prat:"traf",     part:"getroffen",   ru:"встречать"},
+  {inf:"verderben",  infFull:"verderben / verdirbt", prat:"verdarb", part:"verdorben",  ru:"портить"},
+  {inf:"werben",     infFull:"werben / wirbt",     prat:"warb",     part:"geworben",    ru:"вербовать"},
+  {inf:"werfen",     infFull:"werfen / wirft",     prat:"warf",     part:"geworfen",    ru:"бросать"},
+  {inf:"kommen",     infFull:"kommen",             prat:"kam",      part:"gekommen",    ru:"приходить"},
+  {inf:"bitten",     infFull:"bitten",             prat:"bat",      part:"gebeten",     ru:"просить"},
+  {inf:"essen",      infFull:"essen / isst",       prat:"aß",       part:"gegessen",    ru:"есть"},
+  {inf:"geben",      infFull:"geben / gibt",       prat:"gab",      part:"gegeben",     ru:"давать"},
+  {inf:"geschehen",  infFull:"geschehen / geschieht", prat:"geschah", part:"geschehen", ru:"происходить"},
+  {inf:"lesen",      infFull:"lesen / liest",      prat:"las",      part:"gelesen",     ru:"читать"},
+  {inf:"liegen",     infFull:"liegen",             prat:"lag",      part:"gelegen",     ru:"лежать"},
+  {inf:"messen",     infFull:"messen / misst",     prat:"maß",      part:"gemessen",    ru:"мерить"},
+  {inf:"sehen",      infFull:"sehen / sieht",      prat:"sah",      part:"gesehen",     ru:"видеть, смотреть"},
+  {inf:"sitzen",     infFull:"sitzen",             prat:"saß",      part:"gesessen",    ru:"сидеть"},
+  {inf:"treten",     infFull:"treten / tritt",     prat:"trat",     part:"getreten",    ru:"ступать"},
+  {inf:"vergessen",  infFull:"vergessen / vergisst", prat:"vergaß",  part:"vergessen",  ru:"забывать"},
+  {inf:"backen",     infFull:"backen",             prat:"backte",   part:"gebacken",    ru:"печь"},
+  {inf:"fahren",     infFull:"fahren / fährt",     prat:"fuhr",     part:"gefahren",    ru:"ехать"},
+  {inf:"laden",      infFull:"laden / lädt",       prat:"lud",      part:"geladen",     ru:"грузить, заряжать"},
+  {inf:"schlagen",   infFull:"schlagen / schlägt", prat:"schlug",   part:"geschlagen",  ru:"бить"},
+  {inf:"tragen",     infFull:"tragen / trägt",     prat:"trug",     part:"getragen",    ru:"носить"},
+  {inf:"wachsen",    infFull:"wachsen / wächst",   prat:"wuchs",    part:"gewachsen",   ru:"расти"},
+  {inf:"waschen",    infFull:"waschen / wäscht",   prat:"wusch",    part:"gewaschen",   ru:"мыть, стирать"},
+  {inf:"braten",     infFull:"braten / brät",      prat:"briet",    part:"gebraten",    ru:"жарить"},
+  {inf:"fallen",     infFull:"fallen / fällt",     prat:"fiel",     part:"gefallen",    ru:"падать"},
+  {inf:"fangen",     infFull:"fangen / fängt",     prat:"fing",     part:"gefangen",    ru:"ловить"},
+  {inf:"halten",     infFull:"halten / hält",      prat:"hielt",    part:"gehalten",    ru:"держать"},
+  {inf:"lassen",     infFull:"lassen / lässt",     prat:"ließ",     part:"gelassen",    ru:"велеть; оставлять"},
+  {inf:"raten",      infFull:"raten / rät",        prat:"riet",     part:"geraten",     ru:"советовать"},
+  {inf:"schlafen",   infFull:"schlafen / schläft", prat:"schlief",  part:"geschlafen",  ru:"спать"},
+  {inf:"hängen",     infFull:"hängen",             prat:"hing",     part:"gehangen",    ru:"висеть"},
+  {inf:"heißen",     infFull:"heißen",             prat:"hieß",     part:"geheißen",    ru:"звать, называться"},
+  {inf:"laufen",     infFull:"laufen / läuft",     prat:"lief",     part:"gelaufen",    ru:"бегать"},
+  {inf:"rufen",      infFull:"rufen",              prat:"rief",     part:"gerufen",     ru:"кричать, звать"},
+  {inf:"gehen",      infFull:"gehen",              prat:"ging",     part:"gegangen",    ru:"идти"},
+  {inf:"stehen",     infFull:"stehen",             prat:"stand",    part:"gestanden",   ru:"стоять"},
+  {inf:"haben",      infFull:"haben",              prat:"hatte",    part:"gehabt",      ru:"иметь"},
+  {inf:"sein",       infFull:"sein",               prat:"war",      part:"gewesen",     ru:"быть"},
+  {inf:"tun",        infFull:"tun",                prat:"tat",      part:"getan",       ru:"делать"},
+  {inf:"werden",     infFull:"werden / wird",      prat:"wurde",    part:"geworden",    ru:"стать"},
+  {inf:"wissen",     infFull:"wissen",             prat:"wusste",   part:"gewusst",     ru:"знать"},
+  {inf:"bringen",    infFull:"bringen",            prat:"brachte",  part:"gebracht",    ru:"приносить"},
+  {inf:"denken",     infFull:"denken",             prat:"dachte",   part:"gedacht",     ru:"думать"},
+  {inf:"kennen",     infFull:"kennen",             prat:"kannte",   part:"gekannt",     ru:"знать (кого-то)"},
+  {inf:"nennen",     infFull:"nennen",             prat:"nannte",   part:"genannt",     ru:"называть"},
+  {inf:"dürfen",     infFull:"dürfen / darf",      prat:"durfte",   part:"gedurft",     ru:"сметь"},
+  {inf:"müssen",     infFull:"müssen / muss",      prat:"musste",   part:"gemusst",     ru:"быть должным"},
+  {inf:"können",     infFull:"können / kann",      prat:"konnte",   part:"gekonnt",     ru:"мочь"},
+  {inf:"mögen",      infFull:"mögen / mag",        prat:"mochte",   part:"gemocht",     ru:"любить"},
+  {inf:"wollen",     infFull:"wollen / will",      prat:"wollte",   part:"gewollt",     ru:"хотеть"},
+  {inf:"sollen",     infFull:"sollen / soll",      prat:"sollte",   part:"gesollt",     ru:"быть должным (со стороны)"},
+];
+
 // ==================== STATE ====================
 var selChapter = 0; // 0 = all, else chapter num
 var selMode = 'mc-de';
 var curMode = 'mc-de', curChNum = 0;
 var qs=[], qi=0, score=0, errs=0, answered=false;
 var t0=null, curW=null, curQMode='', curAns='';
-var placed=[], curStatFilter='all', curStatSection='vocab', curConjFilter='all', curGenderFilter='all';
+var placed=[], curStatFilter='all', curStatSection='vocab', curConjFilter='all', curGenderFilter='all', curPastFilter='all';
+var selConjMode='conj-word', selGenderMode='gender-mc', selGenderPack=0, selPastMode='past-write';
 var ST = JSON.parse(localStorage.getItem('de-st2')||'{}');
 var CONJ_ST   = JSON.parse(localStorage.getItem('de-conj-st')||'{}');
 var GENDER_ST = JSON.parse(localStorage.getItem('de-gender-st')||'{}');
+var PAST_ST   = JSON.parse(localStorage.getItem('de-past-st')||'{}');
 var gasUrl = localStorage.getItem('de-gas-url')||'';
 
 // ==================== CHAPTER UI ====================
@@ -2429,11 +2574,8 @@ function showVocabStudy(){
 
 // ==================== QUIZ LOGIC ====================
 var MODES=['mc-de','mc-ru','audio','letter'];
-var ML={'mc-de':'🇩🇪 DE','mc-ru':'🇷🇺 RU','audio':'🔊 Слух','letter':'🔤 Буквы','all':'🎯 Микс','conj-word':'🔤 Слово','conj-phrase':'📝 Фраза','conj-write':'✍️ Напиши','conj-all':'🎯 Все типы','gender-mc':'⚥ Род','gender-letter':'🔤 Слово','gender-write':'✍️ Напиши','gender-all':'🎯 Все типы'};
-var BDCLS={'mc-de':'bd1','mc-ru':'bd2','audio':'bd3','letter':'bd4','all':'bd1','conj-word':'bd4','conj-phrase':'bd2','conj-write':'bd3','conj-all':'bd1','gender-mc':'bd2','gender-letter':'bd4','gender-write':'bd3','gender-all':'bd1'};
-var selConjMode   = 'conj-word';
-var selGenderMode = 'gender-mc';
-var selGenderPack = 0;
+var ML={'mc-de':'🇩🇪 DE','mc-ru':'🇷🇺 RU','audio':'🔊 Слух','letter':'🔤 Буквы','all':'🎯 Микс','conj-word':'🔤 Слово','conj-phrase':'📝 Фраза','conj-write':'✍️ Напиши','conj-all':'🎯 Все типы','gender-mc':'⚥ Род','gender-letter':'🔤 Слово','gender-write':'✍️ Напиши','gender-all':'🎯 Все типы','past-write':'✍️ Напиши','past-mc':'🔤 Выбери','past-letter':'🔡 Буквы','past-all':'🎯 Все типы'};
+var BDCLS={'mc-de':'bd1','mc-ru':'bd2','audio':'bd3','letter':'bd4','all':'bd1','conj-word':'bd4','conj-phrase':'bd2','conj-write':'bd3','conj-all':'bd1','gender-mc':'bd2','gender-letter':'bd4','gender-write':'bd3','gender-all':'bd1','past-write':'bd3','past-mc':'bd2','past-letter':'bd4','past-all':'bd1'};
 
 function getPool(){
   return selChapter===0 ? WORDS : WORDS.filter(function(w){ return w.chNum===selChapter; });
@@ -2473,6 +2615,7 @@ function buildQuestions(mode, count){
 function repeatQuiz(){
   if(curChNum===-1) startConjQuiz();
   else if(curChNum===-2) startGenderQuiz();
+  else if(curChNum===-3) startPastQuiz();
   else startQuiz();
 }
 function startQuiz(){
@@ -2574,6 +2717,34 @@ function renderQ(){
     document.getElementById('opts').style.display='none';
     document.getElementById('write-area').style.display='block';
     setTimeout(function(){ document.getElementById('write-input').focus(); }, 100);
+  } else if(m==='past-write'){
+    document.getElementById('qtype').textContent='НАПИШИ PARTIZIP II';
+    document.getElementById('qword').textContent=w.de;
+    document.getElementById('qhint').textContent='прошедшее время';
+    document.getElementById('opts').style.display='none';
+    document.getElementById('write-area').style.display='block';
+    document.getElementById('write-input').placeholder='Partizip II…';
+    setTimeout(function(){ document.getElementById('write-input').focus(); }, 100);
+  } else if(m==='past-mc'){
+    document.getElementById('qtype').textContent='КАК ЗВУЧИТ ПО-НЕМЕЦКИ?';
+    document.getElementById('qword').textContent=w.ru;
+    document.getElementById('qhint').textContent='инфинитив';
+    document.getElementById('opts').style.display='grid';
+    renderPastMC(w);
+  } else if(m==='past-letter-inf'){
+    document.getElementById('qtype').textContent='СОСТАВЬ ИНФИНИТИВ';
+    document.getElementById('qword').textContent=w.ru;
+    document.getElementById('qhint').textContent='инфинитив';
+    document.getElementById('opts').style.display='none';
+    document.getElementById('letter-area').style.display='block';
+    initLetters(w.de);
+  } else if(m==='past-letter-part'){
+    document.getElementById('qtype').textContent='ТЕПЕРЬ PARTIZIP II';
+    document.getElementById('qword').textContent=w.ru;
+    document.getElementById('qhint').textContent='Partizip II';
+    document.getElementById('opts').style.display='none';
+    document.getElementById('letter-area').style.display='block';
+    initLetters(w.de);
   } else {
     document.getElementById('qtype').textContent='СОСТАВЬ СЛОВО ПО-НЕМЕЦКИ';
     document.getElementById('qword').textContent=w.ru;
@@ -2663,6 +2834,7 @@ function checkLetters(){
   document.getElementById('chkbtn').disabled=true;
   if(curW.globalIdx!=null) rec(curW.globalIdx,curQMode,!ok);
   else if(curQMode==='gender-letter') recGender(curW.origDe, !ok);
+  else if(curQMode==='past-letter-inf'||curQMode==='past-letter-part') recPast(curW.inf, !ok);
   else recConj(curW.de, !ok);
   if(ok){ score++; showFB(true,'Правильно! 🎉'); document.querySelectorAll('#lans .ltile').forEach(function(t){ t.classList.remove('placed'); t.classList.add('ok'); }); }
   else { errs++; showFB(false,'Неверно. Правильный ответ: '+curW.de); document.querySelectorAll('#lans .ltile').forEach(function(t){ t.classList.remove('placed'); t.classList.add('bad'); }); }
@@ -2864,6 +3036,131 @@ function checkGenderMC(art){
   document.getElementById('nxtbtn').classList.add('show');
 }
 // ==================== /GENDER FUNCTIONS ====================
+
+// ==================== PAST FUNCTIONS ====================
+function savePastST(){ localStorage.setItem('de-past-st', JSON.stringify(PAST_ST)); }
+function recPast(inf, isErr){
+  if(!PAST_ST[inf]) PAST_ST[inf]={a:0,e:0};
+  PAST_ST[inf].a++; if(isErr) PAST_ST[inf].e++; savePastST();
+}
+function pastSeen(inf){ return PAST_ST[inf] && PAST_ST[inf].a > 0; }
+function pastErrs(inf){ return PAST_ST[inf] ? PAST_ST[inf].e : 0; }
+function unseenFirstPast(){
+  var unseen=PAST_VERBS.filter(function(v){ return !pastSeen(v.inf); });
+  var seen  =PAST_VERBS.filter(function(v){ return  pastSeen(v.inf); });
+  if(unseen.length>0) return unseen.slice().sort(function(){ return Math.random()-.5; });
+  return seen.slice().sort(function(a,b){ return pastErrs(b.inf)-pastErrs(a.inf)+(Math.random()-.5); });
+}
+function buildPastQuestions(mode, count){
+  count=count||15;
+  var pool=unseenFirstPast();
+  function makeW(v){ return {de:v.infFull, inf:v.inf, part:v.part, prat:v.prat, ru:v.ru, globalIdx:null}; }
+  if(mode==='past-write'){
+    return pool.slice(0,count).map(function(v){ return {w:makeW(v), m:'past-write'}; });
+  } else if(mode==='past-mc'){
+    return pool.slice(0,count).map(function(v){ return {w:makeW(v), m:'past-mc'}; });
+  } else if(mode==='past-letter'){
+    var qs=[]; pool.slice(0,Math.ceil(count/2)).forEach(function(v){
+      var base=makeW(v);
+      qs.push({w:Object.assign({},base,{de:v.inf}),  m:'past-letter-inf'});
+      qs.push({w:Object.assign({},base,{de:v.part}), m:'past-letter-part'});
+    });
+    return qs.slice(0,count);
+  } else { // past-all
+    var result=[];
+    pool.forEach(function(v){
+      var r=Math.random();
+      if(r<0.33){ result.push({w:makeW(v),m:'past-write'}); }
+      else if(r<0.66){ result.push({w:makeW(v),m:'past-mc'}); }
+      else {
+        var base=makeW(v);
+        result.push({w:Object.assign({},base,{de:v.inf}),  m:'past-letter-inf'});
+        result.push({w:Object.assign({},base,{de:v.part}), m:'past-letter-part'});
+      }
+    });
+    result.sort(function(){ return Math.random()-.5; });
+    return result.slice(0,count);
+  }
+}
+function showPastStudy(){
+  showScreen('past-study'); updatePastProgress();
+}
+function pickPastMode(m, el){
+  selPastMode=m;
+  document.querySelectorAll('#past-mode-grid .mode-card, #past-study .mode-all .mode-card').forEach(function(c){ c.classList.remove('selected'); });
+  el.classList.add('selected');
+}
+function updatePastProgress(){
+  var total=PAST_VERBS.length;
+  var seen=PAST_VERBS.filter(function(v){ return pastSeen(v.inf); }).length;
+  var pct=Math.round(seen/total*100);
+  document.getElementById('past-progress-card').innerHTML=
+    '<div style="display:flex;gap:12px;align-items:center">'+
+    '<div style="flex:1"><div style="font-size:11px;color:#5a5a78;font-family:Syne,sans-serif;font-weight:700;margin-bottom:4px">ИЗУЧЕНО ГЛАГОЛОВ</div>'+
+    '<div style="font-size:20px;font-weight:800;font-family:Syne,sans-serif">'+seen+'<span style="font-size:13px;font-weight:500;color:#5a5a78"> / '+total+'</span></div></div>'+
+    '<div style="font-size:28px;font-weight:900;font-family:Syne,sans-serif;color:var(--acc3)">'+pct+'%</div></div>';
+}
+function startPastQuiz(){
+  curMode=selPastMode; curChNum=-3;
+  qs=buildPastQuestions(selPastMode,15);
+  qi=0; score=0; errs=0; answered=false; t0=Date.now();
+  document.getElementById('qtot').textContent=qs.length;
+  var b=document.getElementById('qbadge');
+  b.textContent=ML[selPastMode]||'⏮'; b.className='qbadge '+(BDCLS[selPastMode]||'bd3');
+  showScreen('quiz'); renderQ();
+}
+function renderPastMC(targetW){
+  var area=document.getElementById('opts'); area.innerHTML='';
+  var cv=targetW.de;
+  var pool=PAST_VERBS.filter(function(v){ return v.inf!==targetW.inf; });
+  var distractors=pool.sort(function(){ return Math.random()-.5; }).slice(0,3).map(function(v){ return v.infFull; });
+  var opts=[cv].concat(distractors).sort(function(){ return Math.random()-.5; });
+  ['A','B','C','D'].forEach(function(l,i){
+    if(i>=opts.length) return;
+    var btn=document.createElement('button'); btn.className='opt';
+    btn.innerHTML='<span class="oltr">'+l+'</span><span>'+opts[i]+'</span>';
+    (function(val){
+      btn.onclick=function(){
+        if(answered) return; answered=true;
+        var ok=val===cv;
+        document.querySelectorAll('#opts .opt').forEach(function(b){
+          b.disabled=true;
+          if(b.querySelectorAll('span')[1].textContent===cv) b.classList.add('correct');
+          if(b===btn&&!ok) b.classList.add('wrong');
+        });
+        recPast(targetW.inf,!ok);
+        if(ok){ score++; showFB(true,'Правильно! 🎉'); }
+        else { errs++; showFB(false,'Неверно. Правильный ответ: '+cv); }
+        document.getElementById('nxtbtn').classList.add('show');
+      };
+    })(opts[i]);
+    area.appendChild(btn);
+  });
+}
+function renderPastStatList(f){
+  var list=document.getElementById('past-wlist'); list.innerHTML='';
+  var items=[];
+  PAST_VERBS.forEach(function(v){
+    var d=PAST_ST[v.inf]; if(!d) return;
+    items.push({inf:v.infFull, part:v.part, ru:v.ru, a:d.a, e:d.e});
+  });
+  items.sort(function(a,b){ return b.e-a.e; });
+  items.forEach(function(it){
+    if(f==='errors'&&it.e===0) return;
+    var row=document.createElement('div'); row.className='wrow';
+    row.innerHTML='<div><div class="wde">'+it.inf+'</div><div class="wtypes" style="margin-top:3px"><span class="wtb t2" style="font-size:9px">⏮ '+it.part+'</span> '+it.e+' ош. / '+it.a+' попыток</div></div><div class="wru">'+it.ru+'</div>'+errBadge(it.e,it.a);
+    list.appendChild(row);
+  });
+  if(!list.innerHTML) list.innerHTML='<div style="color:#44445a;text-align:center;padding:28px;font-size:13px">Нет данных</div>';
+}
+function psflt(f,el){
+  curPastFilter=f;
+  document.querySelectorAll('#stsec-past .ftabs .ftab').forEach(function(t){ t.classList.remove('active'); });
+  el.classList.add('active');
+  renderPastStatList(f);
+}
+// ==================== /PAST FUNCTIONS ====================
+
 function startConjQuiz(){
   curMode = selConjMode; curChNum = -1;
   qs = buildConjQuestions(selConjMode, 15);
@@ -2876,14 +3173,18 @@ function startConjQuiz(){
 }
 function checkWrite(){
   if(answered) return; answered=true;
-  var correct = curW.verbForm !== undefined ? curW.verbForm : curW.de;
+  var correct;
+  if(curQMode==='past-write') correct=curW.part;
+  else if(curW.verbForm!==undefined) correct=curW.verbForm;
+  else correct=curW.de;
   var input=document.getElementById('write-input').value.trim();
   var ok=input.toLowerCase()===correct.toLowerCase();
   document.getElementById('write-input').disabled=true;
   document.getElementById('wrtbtn').disabled=true;
   if(ok){ score++; showFB(true,'Правильно! 🎉'); }
-  else { errs++; showFB(false,'Неверно. Правильный ответ: '+curW.de); }
-  if(curQMode==='gender-write') recGender(curW.origDe, !ok);
+  else { errs++; showFB(false,'Неверно. Правильный ответ: '+correct); }
+  if(curQMode==='past-write') recPast(curW.inf, !ok);
+  else if(curQMode==='gender-write') recGender(curW.origDe, !ok);
   else recConj(curW.de, !ok);
   document.getElementById('nxtbtn').classList.add('show');
 }
@@ -2897,7 +3198,7 @@ function showResults(){
   document.getElementById('rlbl').textContent=pct>=80?'Отлично!':pct>=50?'Хороший результат!':'Нужно повторить!';
   document.getElementById('rright').textContent=score;
   document.getElementById('rwrong').textContent=errs;
-  document.getElementById('rchap').textContent=curChNum===-1?'🔄 Спряжения':curChNum===-2?'⚥ Род':curChNum===0?'Все главы':'Kapitel '+curChNum;
+  document.getElementById('rchap').textContent=curChNum===-1?'🔄 Спряжения':curChNum===-2?'⚥ Род':curChNum===-3?'⏮ Прошедшее':curChNum===0?'Все главы':'Kapitel '+curChNum;
   document.getElementById('rmode').textContent=ML[curMode];
   var el=Math.round((Date.now()-t0)/1000);
   document.getElementById('rtime').textContent=el<60?el+' сек':Math.floor(el/60)+' мин '+(el%60)+' сек';
@@ -2936,9 +3237,16 @@ function showStats(){
   document.getElementById('gst-tot').textContent=gtot;
   document.getElementById('gst-ok').textContent=gok;
   document.getElementById('gst-err').textContent=gte;
+  // ── past summary ──
+  var ptot=0,pok=0,pte=0;
+  Object.values(PAST_ST).forEach(function(d){ ptot+=d.a; pok+=d.a-d.e; pte+=d.e; });
+  document.getElementById('pst-tot').textContent=ptot;
+  document.getElementById('pst-ok').textContent=pok;
+  document.getElementById('pst-err').textContent=pte;
   renderWList(curStatFilter);
   renderConjStatList(curConjFilter);
   renderGenderStatList(curGenderFilter);
+  renderPastStatList(curPastFilter);
   // restore saved tab
   var savedTab=localStorage.getItem('de-stat-tab')||'vocab';
   if(savedTab!==curStatSection){
@@ -2949,6 +3257,7 @@ function showStats(){
     document.getElementById('stsec-vocab').style.display  = curStatSection==='vocab'  ? '' : 'none';
     document.getElementById('stsec-conj').style.display   = curStatSection==='conj'   ? '' : 'none';
     document.getElementById('stsec-gender').style.display = curStatSection==='gender' ? '' : 'none';
+    document.getElementById('stsec-past').style.display   = curStatSection==='past'   ? '' : 'none';
   }
   showScreen('stats-page');
 }
@@ -2961,6 +3270,7 @@ function sSection(s, el){
   document.getElementById('stsec-vocab').style.display  = s==='vocab'  ? '' : 'none';
   document.getElementById('stsec-conj').style.display   = s==='conj'   ? '' : 'none';
   document.getElementById('stsec-gender').style.display = s==='gender' ? '' : 'none';
+  document.getElementById('stsec-past').style.display   = s==='past'   ? '' : 'none';
 }
 
 function sflt(f,el){
