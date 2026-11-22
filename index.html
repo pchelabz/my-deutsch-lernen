@@ -263,8 +263,8 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
     <div class="menu-card" onclick="showVocabStudy()">
       <div class="mc-big-icon">📚</div>
       <div class="mc-big-info">
-        <div class="mc-big-name">Учу слова</div>
-        <div class="mc-big-desc">Карточки, перевод, аудио и составление слов по главам</div>
+        <div class="mc-big-name">Учу слова А1</div>
+        <div class="mc-big-desc">Карточки, перевод и составление слов по главам</div>
       </div>
       <div class="mc-big-arr">›</div>
     </div>
@@ -296,8 +296,16 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
       <div class="mc-big-arr">›</div>
     </div>
 
+    <div class="menu-card" onclick="showVocabA2Study()">
+      <div class="mc-big-icon">📗</div>
+      <div class="mc-big-info">
+        <div class="mc-big-name">Учу слова А2</div>
+        <div class="mc-big-desc">Лексика Netzwerk neu A2 по главам</div>
+      </div>
+      <div class="mc-big-arr">›</div>
+    </div>
+
     <button class="btn btn-ghost" onclick="showStats()" style="margin-top:8px">📊 Статистика ошибок</button>
-    <button class="btn btn-ghost" onclick="showAddWords()">✏️ Мои слова</button>
   </div>
 </div>
 
@@ -305,7 +313,7 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
 <div id="vocab-study" class="screen">
   <div class="shdr">
     <button class="back-btn" onclick="goHome()">← Назад</button>
-    <div class="shdr-title">Учу слова</div>
+    <div class="shdr-title" id="vocab-study-title">Учу слова А1</div>
   </div>
   <div class="sbody">
     <div class="sec-lbl">Выбери главу</div>
@@ -315,11 +323,10 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
     <div class="mode-grid2">
       <div class="mode-card selected" onclick="pickMode('mc-de',this)"><div class="mc-icon">🇩🇪</div><div class="mc-name">Тест DE</div><div class="mc-desc">Русское → немецкое</div></div>
       <div class="mode-card" onclick="pickMode('mc-ru',this)"><div class="mc-icon">🇷🇺</div><div class="mc-name">Тест RU</div><div class="mc-desc">Немецкое → перевод</div></div>
-      <div class="mode-card" onclick="pickMode('audio',this)"><div class="mc-icon">🔊</div><div class="mc-name">На слух</div><div class="mc-desc">Слушай и переводи</div></div>
       <div class="mode-card" onclick="pickMode('letter',this)"><div class="mc-icon">🔤</div><div class="mc-name">Составь слово</div><div class="mc-desc">Собери из букв</div></div>
     </div>
     <div class="mode-all">
-      <div class="mode-card" onclick="pickMode('all',this)"><div class="mc-icon">🎯</div><div class="mc-name">Все режимы</div><div class="mc-desc">Смешанный — все 4 типа заданий</div></div>
+      <div class="mode-card" onclick="pickMode('all',this)"><div class="mc-icon">🎯</div><div class="mc-name">Все режимы</div><div class="mc-desc">Смешанный — все 3 типа заданий</div></div>
     </div>
     <button class="btn btn-red" onclick="startQuiz()">Начать</button>
   </div>
@@ -398,41 +405,10 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
   </div>
 </div>
 
-<!-- ===== ADD WORDS ===-->
-<div id="add-words" class="screen">
-  <div class="shdr">
-    <button class="back-btn" onclick="goHome()">← Назад</button>
-    <div class="shdr-title">Мои слова</div>
-    <button class="back-btn" onclick="showAddForm()" style="color:var(--grn);border-color:rgba(94,232,160,.3)">+ Добавить</button>
-  </div>
-  <div class="sbody">
-    <div class="modal-sub" style="margin-bottom:20px">Слова добавляются в главу <strong>«Meine Wörter»</strong> и доступны для изучения сразу.</div>
-    <div id="my-words-list"></div>
-  </div>
-</div>
-
-<!-- ===== ADD WORD FORM ===-->
-<div id="add-word-form" class="screen">
-  <div class="shdr">
-    <button class="back-btn" onclick="showAddWords()">← Назад</button>
-    <div class="shdr-title">Новое слово</div>
-  </div>
-  <div class="sbody">
-    <label class="ilbl">Немецкое слово</label>
-    <input class="ifield" id="new-de" placeholder="z.B. der Hund" style="margin-bottom:12px">
-    <label class="ilbl">Перевод на русский</label>
-    <input class="ifield" id="new-ru" placeholder="z.B. собака" style="margin-bottom:12px">
-    <label class="ilbl">Подсказка (необязательно)</label>
-    <input class="ifield" id="new-hint" placeholder="z.B. сущ., м.р., -e" style="margin-bottom:20px">
-    <button class="btn btn-red" onclick="saveNewWord()">Сохранить слово</button>
-    <div id="add-word-error" style="color:var(--acc);font-size:13px;margin-top:10px;display:none"></div>
-  </div>
-</div>
-
 <!-- ===== QUIZ ===== -->
 <div id="quiz" class="screen">
   <div class="qhdr">
-    <button class="back-btn" onclick="curChNum===-1?showConjStudy():curChNum===-2?showGenderStudy():curChNum===-3?showPastStudy():showVocabStudy()">← Назад</button>
+    <button class="back-btn" onclick="curChNum===-1?showConjStudy():curChNum===-2?showGenderStudy():curChNum===-3?showPastStudy():curVocabSet==='a2'?showVocabA2Study():showVocabStudy()">← Назад</button>
     <div class="prog-wrap">
       <div class="prog-lbl"><span id="qcur">1</span> / <span id="qtot">20</span><span id="qsc">✓ 0</span></div>
       <div class="prog-bar"><div class="prog-fill" id="pfill" style="width:0%"></div></div>
@@ -443,12 +419,6 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
     <div class="qtype" id="qtype"></div>
     <div class="qword" id="qword"></div>
     <div class="qhint" id="qhint"></div>
-    <div id="audio-area" style="display:none">
-      <div class="audio-box">
-        <button class="audio-btn" id="abtn" onclick="speak()">🔊</button>
-        <div class="audio-hint">Нажми, чтобы послушать</div>
-      </div>
-    </div>
     <div class="opts" id="opts"></div>
     <div id="letter-area" style="display:none">
       <div class="ahint">Нажимай буквы чтобы составить слово</div>
@@ -516,7 +486,6 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
       <div class="scards" style="margin-bottom:20px">
         <div class="scard"><div class="n" id="sm-de" style="color:var(--acc3)">0</div><div class="l">🇩🇪 DE</div></div>
         <div class="scard"><div class="n" id="sm-ru" style="color:var(--acc2)">0</div><div class="l">🇷🇺 RU</div></div>
-        <div class="scard"><div class="n" id="sm-au" style="color:var(--grn)">0</div><div class="l">🔊 Слух</div></div>
         <div class="scard" style="grid-column:1/-1"><div class="n" id="sm-lt" style="color:var(--acc)">0</div><div class="l">🔤 Буквы</div></div>
       </div>
       <div class="sec-lbl" style="margin-bottom:10px">Слова</div>
@@ -525,7 +494,6 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
         <div class="ftab" onclick="sflt('errors',this)">Только ошибки</div>
         <div class="ftab" onclick="sflt('mc-de',this)">🇩🇪</div>
         <div class="ftab" onclick="sflt('mc-ru',this)">🇷🇺</div>
-        <div class="ftab" onclick="sflt('audio',this)">🔊</div>
         <div class="ftab" onclick="sflt('letter',this)">🔤</div>
       </div>
       <div class="wlist" id="wlist"></div>
@@ -2020,26 +1988,12 @@ const CHAPTERS = [
 ];
 
 // ==================== BUILD FLAT INDEX ====================
-var MY_CHAPTER_NUM = 99;
-var MY_CHAPTER_NAME = 'Meine Wörter';
-var MY_WORDS = JSON.parse(localStorage.getItem('de-mywords')||'[]');
-
 var WORDS = []; // flat array {de,ru,h,chNum,chName,globalIdx}
-CHAPTERS.forEach(function(ch,ci){
-  ch.words.forEach(function(w,wi){
+CHAPTERS.forEach(function(ch){
+  ch.words.forEach(function(w){
     WORDS.push({de:w.de,ru:w.ru,h:w.h,chNum:ch.num,chName:ch.name,globalIdx:WORDS.length});
   });
 });
-
-function rebuildMyWords(){
-  // Remove old custom words
-  WORDS = WORDS.filter(function(w){ return w.chNum !== MY_CHAPTER_NUM; });
-  // Add current custom words
-  MY_WORDS.forEach(function(w){
-    WORDS.push({de:w.de,ru:w.ru,h:w.h||'',chNum:MY_CHAPTER_NUM,chName:MY_CHAPTER_NAME,globalIdx:WORDS.length});
-  });
-}
-rebuildMyWords();
 
 // ==================== CONJUGATION DATA ====================
 var CONJ_WORDS = [
@@ -2254,6 +2208,23 @@ var GENDER_PACKS = [
   ]},
 ];
 
+// Auto-generate A1 gender packs from CHAPTERS data
+(function(){
+  CHAPTERS.forEach(function(ch){
+    var nouns = ch.words.filter(function(w){
+      return w.h && w.h.indexOf('сущ.') >= 0 &&
+             w.h.indexOf('мн.ч.') < 0 &&
+             /^(die|der|das) /.test(w.de);
+    }).map(function(w){
+      var sp = w.de.indexOf(' ');
+      return {de: w.de.slice(sp+1), ru: w.ru, art: w.de.slice(0, sp)};
+    });
+    if(nouns.length > 0){
+      GENDER_PACKS.push({num: 10+ch.num, name: 'А1-Гл.'+ch.num+': '+ch.name, words: nouns});
+    }
+  });
+})();
+
 // ==================== PAST VERBS ====================
 var PAST_VERBS = [
   {inf:"bleiben",    infFull:"bleiben",            prat:"blieb",    part:"geblieben",   ru:"оставаться"},
@@ -2349,7 +2320,322 @@ var PAST_VERBS = [
   {inf:"sollen",     infFull:"sollen / soll",      prat:"sollte",   part:"gesollt",     ru:"быть должным (со стороны)"},
 ];
 
+// ==================== A2 VOCAB DATA ====================
+var CHAPTERS_A2 = [
+  {num:1, name:"Пер. знакомства", words:[
+    {de:"die Ausbildung",ru:"образование, профобучение",h:"сущ., ж.р."},
+    {de:"die Bankkauffrau",ru:"служащая банка",h:"сущ., ж.р."},
+    {de:"der Bankkaufmann",ru:"служащий банка",h:"сущ., м.р."},
+    {de:"das Land",ru:"страна",h:"сущ., ср.р."},
+    {de:"das Pferd",ru:"лошадь",h:"сущ., ср.р."},
+    {de:"reiten",ru:"ездить верхом",h:"глагол"},
+    {de:"renovieren",ru:"ремонтировать",h:"глагол"},
+    {de:"der Rentner",ru:"пенсионер",h:"сущ., м.р."},
+    {de:"die Rentnerin",ru:"пенсионерка",h:"сущ., ж.р."},
+    {de:"heiraten",ru:"жениться / выходить замуж",h:"глагол"},
+    {de:"die Hochzeit",ru:"свадьба",h:"сущ., ж.р."},
+    {de:"mieten",ru:"снимать (жильё)",h:"глагол"},
+    {de:"die Note",ru:"оценка",h:"сущ., ж.р."},
+    {de:"organisieren",ru:"организовывать",h:"глагол"},
+    {de:"romantisch",ru:"романтичный",h:"прил."},
+    {de:"spannend",ru:"увлекательный",h:"прил."},
+    {de:"teilnehmen",ru:"принимать участие",h:"глагол"},
+    {de:"der Verein",ru:"клуб, объединение",h:"сущ., м.р."},
+    {de:"die Grippe",ru:"грипп",h:"сущ., ж.р."},
+    {de:"die Überstunde",ru:"сверхурочная работа",h:"сущ., ж.р."},
+    {de:"vorschlagen",ru:"предлагать",h:"глагол"},
+    {de:"ändern",ru:"изменять",h:"глагол"},
+    {de:"der Flohmarkt",ru:"блошиный рынок",h:"сущ., м.р."},
+    {de:"gemeinsam",ru:"вместе, совместно",h:"прил./нареч."},
+    {de:"der Platz",ru:"место, площадь",h:"сущ., м.р."},
+    {de:"die Angst",ru:"страх",h:"сущ., ж.р."},
+    {de:"das Handy",ru:"мобильный телефон",h:"сущ., ср.р."},
+    {de:"die Reservierung",ru:"бронирование",h:"сущ., ж.р."},
+    {de:"der Aufenthalt",ru:"пребывание",h:"сущ., м.р."},
+    {de:"bitter",ru:"горький",h:"прил."},
+    {de:"salzig",ru:"солёный",h:"прил."},
+    {de:"sauer",ru:"кислый",h:"прил."},
+    {de:"scharf",ru:"острый",h:"прил."},
+  ]},
+  {num:2, name:"Школа и работа", words:[
+    {de:"die Schulzeit",ru:"школьные годы",h:"сущ., ж.р."},
+    {de:"der Altenpfleger",ru:"работник по уходу за пожилыми",h:"сущ., м.р."},
+    {de:"das Abitur",ru:"аттестат зрелости",h:"сущ., ср.р."},
+    {de:"die Berufsschule",ru:"профессиональное училище",h:"сущ., ж.р."},
+    {de:"der Schüler",ru:"школьник, ученик",h:"сущ., м.р."},
+    {de:"die Schülerin",ru:"школьница, ученица",h:"сущ., ж.р."},
+    {de:"die Vorlesung",ru:"лекция",h:"сущ., ж.р."},
+    {de:"das Zeugnis",ru:"свидетельство, аттестат",h:"сущ., ср.р."},
+    {de:"der Direktor",ru:"директор",h:"сущ., м.р."},
+    {de:"die Erinnerung",ru:"воспоминание",h:"сущ., ж.р."},
+    {de:"erwachsen",ru:"взрослый",h:"прил."},
+    {de:"die Ferien",ru:"каникулы",h:"сущ., мн.ч."},
+    {de:"furchtbar",ru:"ужасный, жуткий",h:"прил."},
+    {de:"der Kontakt",ru:"контакт",h:"сущ., м.р."},
+    {de:"streng",ru:"строгий",h:"прил."},
+    {de:"witzig",ru:"смешной, забавный",h:"прил."},
+    {de:"wütend",ru:"разъярённый",h:"прил."},
+    {de:"die Schuluniform",ru:"школьная форма",h:"сущ., ж.р."},
+    {de:"die Klassenfahrt",ru:"поездка с классом",h:"сущ., ж.р."},
+    {de:"die Behinderung",ru:"инвалидность",h:"сущ., ж.р."},
+    {de:"das Handwerk",ru:"ремесло",h:"сущ., ср.р."},
+    {de:"der Rollstuhl",ru:"инвалидная коляска",h:"сущ., м.р."},
+    {de:"der Schulabschluss",ru:"окончание школы",h:"сущ., м.р."},
+    {de:"die Meinung",ru:"мнение",h:"сущ., ж.р."},
+    {de:"die Erfahrung",ru:"опыт",h:"сущ., ж.р."},
+    {de:"die Weltreise",ru:"кругосветное путешествие",h:"сущ., ж.р."},
+    {de:"das Bundesland",ru:"федеральная земля",h:"сущ., ср.р."},
+    {de:"das Gymnasium",ru:"гимназия",h:"сущ., ср.р."},
+    {de:"die Realschule",ru:"средняя школа",h:"сущ., ж.р."},
+    {de:"die Fremdsprache",ru:"иностранный язык",h:"сущ., ж.р."},
+    {de:"jobben",ru:"работать (подработка)",h:"глагол"},
+    {de:"die Vorbereitung",ru:"подготовка",h:"сущ., ж.р."},
+  ]},
+  {num:3, name:"Медиа и технологии", words:[
+    {de:"chatten",ru:"общаться в чате",h:"глагол"},
+    {de:"downloaden",ru:"скачивать",h:"глагол"},
+    {de:"der Link",ru:"ссылка",h:"сущ., м.р."},
+    {de:"das Radio",ru:"радио",h:"сущ., ср.р."},
+    {de:"die Webseite",ru:"веб-сайт",h:"сущ., ж.р."},
+    {de:"das E-Book",ru:"электронная книга",h:"сущ., ср.р."},
+    {de:"der Laptop",ru:"ноутбук",h:"сущ., м.р."},
+    {de:"das Smartphone",ru:"смартфон",h:"сущ., ср.р."},
+    {de:"der Bildschirm",ru:"экран",h:"сущ., м.р."},
+    {de:"das Kabel",ru:"кабель",h:"сущ., ср.р."},
+    {de:"die Tastatur",ru:"клавиатура",h:"сущ., ж.р."},
+    {de:"löschen",ru:"удалять, стирать",h:"глагол"},
+    {de:"hochladen",ru:"загружать (файл)",h:"глагол"},
+    {de:"teilen",ru:"делиться",h:"глагол"},
+    {de:"entwickeln",ru:"разрабатывать",h:"глагол"},
+    {de:"gründen",ru:"основывать",h:"глагол"},
+    {de:"programmieren",ru:"программировать",h:"глагол"},
+    {de:"schwierig",ru:"сложный, трудный",h:"прил."},
+    {de:"die Umfrage",ru:"опрос",h:"сущ., ж.р."},
+    {de:"peinlich",ru:"неловкий, стыдный",h:"прил."},
+    {de:"vorsichtig",ru:"осторожный, аккуратный",h:"прил."},
+    {de:"der Actionfilm",ru:"боевик",h:"сущ., м.р."},
+    {de:"die Komödie",ru:"комедия",h:"сущ., ж.р."},
+    {de:"der Krimi",ru:"детектив",h:"сущ., м.р."},
+    {de:"der Thriller",ru:"триллер",h:"сущ., м.р."},
+    {de:"die Freundschaft",ru:"дружба",h:"сущ., ж.р."},
+    {de:"das Schicksal",ru:"судьба",h:"сущ., ср.р."},
+    {de:"der Witz",ru:"шутка, анекдот",h:"сущ., м.р."},
+    {de:"lachen",ru:"смеяться",h:"глагол"},
+    {de:"weinen",ru:"плакать",h:"глагол"},
+  ]},
+  {num:4, name:"Чувства и события", words:[
+    {de:"aufgeregt",ru:"взволнованный",h:"прил."},
+    {de:"bestehen",ru:"сдавать (экзамен)",h:"глагол"},
+    {de:"das Brautkleid",ru:"свадебное платье",h:"сущ., ср.р."},
+    {de:"der Führerschein",ru:"водительское удостоверение",h:"сущ., м.р."},
+    {de:"die Geburt",ru:"рождение",h:"сущ., ж.р."},
+    {de:"das Gefühl",ru:"чувство, ощущение",h:"сущ., ср.р."},
+    {de:"gratulieren",ru:"поздравлять",h:"глагол"},
+    {de:"die Medaille",ru:"медаль",h:"сущ., ж.р."},
+    {de:"nervös",ru:"нервный",h:"прил."},
+    {de:"der Ring",ru:"кольцо",h:"сущ., м.р."},
+    {de:"der Sieg",ru:"победа",h:"сущ., м.р."},
+    {de:"stolz",ru:"гордый",h:"прил."},
+    {de:"traurig",ru:"грустный, печальный",h:"прил."},
+    {de:"die Laune",ru:"настроение",h:"сущ., ж.р."},
+    {de:"die Liebe",ru:"любовь",h:"сущ., ж.р."},
+    {de:"die Zukunft",ru:"будущее",h:"сущ., ж.р."},
+    {de:"die Freude",ru:"радость",h:"сущ., ж.р."},
+    {de:"die Emotion",ru:"эмоция",h:"сущ., ж.р."},
+    {de:"das Feuerwerk",ru:"фейерверк",h:"сущ., ср.р."},
+    {de:"bedanken",ru:"благодарить",h:"глагол"},
+    {de:"ärgern",ru:"злиться, раздражаться",h:"глагол"},
+    {de:"entscheiden",ru:"решать",h:"глагол"},
+    {de:"erinnern",ru:"напоминать, вспоминать",h:"глагол"},
+    {de:"hoffen",ru:"надеяться",h:"глагол"},
+    {de:"bewundern",ru:"восхищаться",h:"глагол"},
+  ]},
+  {num:5, name:"Общество и документы", words:[
+    {de:"das Amt",ru:"учреждение, ведомство",h:"сущ., ср.р."},
+    {de:"die Behörde",ru:"власти, ведомство",h:"сущ., ж.р."},
+    {de:"öffentlich",ru:"общественный, публичный",h:"прил."},
+    {de:"die Polizei",ru:"полиция",h:"сущ., ж.р."},
+    {de:"der Antrag",ru:"заявление, ходатайство",h:"сущ., м.р."},
+    {de:"ausfüllen",ru:"заполнять",h:"глагол"},
+    {de:"das Dokument",ru:"документ",h:"сущ., ср.р."},
+    {de:"genehmigen",ru:"разрешать, утверждать",h:"глагол"},
+    {de:"die Sicherheit",ru:"безопасность",h:"сущ., ж.р."},
+    {de:"die Feuerwehr",ru:"пожарная охрана",h:"сущ., ж.р."},
+    {de:"das Vorstellungsgespräch",ru:"собеседование",h:"сущ., ср.р."},
+    {de:"bewerben",ru:"подавать заявку",h:"глагол"},
+    {de:"die Stellenanzeige",ru:"объявление о работе",h:"сущ., ж.р."},
+    {de:"spontan",ru:"спонтанный",h:"прил."},
+    {de:"die Einbürgerung",ru:"натурализация",h:"сущ., ж.р."},
+    {de:"die Geldbörse",ru:"кошелёк",h:"сущ., ж.р."},
+    {de:"der Kredit",ru:"кредит",h:"сущ., м.р."},
+    {de:"verlängern",ru:"продлевать",h:"глагол"},
+    {de:"die Grenze",ru:"граница",h:"сущ., ж.р."},
+    {de:"das Visum",ru:"виза",h:"сущ., ср.р."},
+    {de:"leihen",ru:"давать / брать взаймы",h:"глагол"},
+    {de:"bitten",ru:"просить",h:"глагол"},
+    {de:"der Stadtplan",ru:"план города",h:"сущ., м.р."},
+  ]},
+  {num:6, name:"Работа и музыка", words:[
+    {de:"die Geschäftsreise",ru:"командировка",h:"сущ., ж.р."},
+    {de:"zurückkommen",ru:"возвращаться",h:"глагол"},
+    {de:"die Bahn",ru:"поезд, железная дорога",h:"сущ., ж.р."},
+    {de:"der Fahrplan",ru:"расписание",h:"сущ., м.р."},
+    {de:"die Durchsage",ru:"объявление",h:"сущ., ж.р."},
+    {de:"die Band",ru:"музыкальный ансамбль",h:"сущ., ж.р."},
+    {de:"erleben",ru:"переживать, испытывать",h:"глагол"},
+    {de:"die Ermäßigung",ru:"скидка, льгота",h:"сущ., ж.р."},
+    {de:"der Musiker",ru:"музыкант",h:"сущ., м.р."},
+    {de:"der Sänger",ru:"певец",h:"сущ., м.р."},
+    {de:"die Sängerin",ru:"певица",h:"сущ., ж.р."},
+    {de:"die Chance",ru:"шанс, возможность",h:"сущ., ж.р."},
+    {de:"die Freiheit",ru:"свобода",h:"сущ., ж.р."},
+    {de:"das Gehalt",ru:"зарплата",h:"сущ., ср.р."},
+    {de:"das Risiko",ru:"риск",h:"сущ., ср.р."},
+    {de:"der Übersetzer",ru:"переводчик",h:"сущ., м.р."},
+    {de:"die Umwelt",ru:"окружающая среда",h:"сущ., ж.р."},
+    {de:"der Betrieb",ru:"предприятие",h:"сущ., м.р."},
+    {de:"die Fabrik",ru:"фабрика",h:"сущ., ж.р."},
+    {de:"die Maschine",ru:"машина, станок",h:"сущ., ж.р."},
+    {de:"der Roboter",ru:"робот",h:"сущ., м.р."},
+    {de:"die Zusammenarbeit",ru:"сотрудничество",h:"сущ., ж.р."},
+    {de:"beeilen",ru:"торопиться",h:"глагол"},
+    {de:"beraten",ru:"консультировать",h:"глагол"},
+  ]},
+  {num:7, name:"Транспорт и город", words:[
+    {de:"die Ampel",ru:"светофор",h:"сущ., ж.р."},
+    {de:"der Motor",ru:"двигатель",h:"сущ., м.р."},
+    {de:"die Panne",ru:"поломка, авария",h:"сущ., ж.р."},
+    {de:"der Reifen",ru:"шина",h:"сущ., м.р."},
+    {de:"der Stau",ru:"пробка, затор",h:"сущ., м.р."},
+    {de:"das Navi",ru:"навигатор",h:"сущ., ср.р."},
+    {de:"bremsen",ru:"тормозить",h:"глагол"},
+    {de:"buchen",ru:"бронировать",h:"глагол"},
+    {de:"die Garage",ru:"гараж",h:"сущ., ж.р."},
+    {de:"parken",ru:"парковаться",h:"глагол"},
+    {de:"die Tankstelle",ru:"заправочная станция",h:"сущ., ж.р."},
+    {de:"die Versicherung",ru:"страхование, страховка",h:"сущ., ж.р."},
+    {de:"der E-Scooter",ru:"электросамокат",h:"сущ., м.р."},
+    {de:"die Werbung",ru:"реклама",h:"сущ., ж.р."},
+    {de:"die Kreuzung",ru:"перекрёсток",h:"сущ., ж.р."},
+    {de:"die Großstadt",ru:"мегаполис, крупный город",h:"сущ., ж.р."},
+    {de:"die Innenstadt",ru:"центр города",h:"сущ., ж.р."},
+    {de:"der Radweg",ru:"велосипедная дорожка",h:"сущ., м.р."},
+    {de:"versprechen",ru:"обещать",h:"глагол"},
+    {de:"vorhaben",ru:"планировать, собираться",h:"глагол"},
+  ]},
+  {num:8, name:"Учёба и хобби", words:[
+    {de:"abonnieren",ru:"подписываться",h:"глагол"},
+    {de:"beschweren",ru:"жаловаться",h:"глагол"},
+    {de:"die Gitarre",ru:"гитара",h:"сущ., ж.р."},
+    {de:"das Instrument",ru:"инструмент",h:"сущ., ср.р."},
+    {de:"der Kanal",ru:"канал",h:"сущ., м.р."},
+    {de:"das Klavier",ru:"пианино",h:"сущ., ср.р."},
+    {de:"die Qualität",ru:"качество",h:"сущ., ж.р."},
+    {de:"die Rente",ru:"пенсия",h:"сущ., ж.р."},
+    {de:"das Herz",ru:"сердце",h:"сущ., ср.р."},
+    {de:"das Stipendium",ru:"стипендия",h:"сущ., ср.р."},
+    {de:"verschieben",ru:"откладывать, переносить",h:"глагол"},
+    {de:"der Wald",ru:"лес",h:"сущ., м.р."},
+    {de:"die Zitrone",ru:"лимон",h:"сущ., ж.р."},
+    {de:"der Ratschlag",ru:"совет",h:"сущ., м.р."},
+    {de:"der Arbeitgeber",ru:"работодатель",h:"сущ., м.р."},
+    {de:"die Kommunikation",ru:"коммуникация",h:"сущ., ж.р."},
+    {de:"die Konferenz",ru:"конференция",h:"сущ., ж.р."},
+    {de:"die Reparatur",ru:"ремонт",h:"сущ., ж.р."},
+    {de:"reparieren",ru:"ремонтировать",h:"глагол"},
+    {de:"die Bücherei",ru:"библиотека",h:"сущ., ж.р."},
+    {de:"das Werkzeug",ru:"инструмент, оборудование",h:"сущ., ср.р."},
+  ]},
+  {num:9, name:"Спорт и природа", words:[
+    {de:"die Sportart",ru:"вид спорта",h:"сущ., ж.р."},
+    {de:"surfen",ru:"заниматься сёрфингом",h:"глагол"},
+    {de:"tauchen",ru:"нырять с аквалангом",h:"глагол"},
+    {de:"die Mannschaft",ru:"команда",h:"сущ., ж.р."},
+    {de:"das Tor",ru:"ворота, гол",h:"сущ., ср.р."},
+    {de:"der Wettbewerb",ru:"соревнование, конкурс",h:"сущ., м.р."},
+    {de:"der Erfolg",ru:"успех",h:"сущ., м.р."},
+    {de:"die Gesundheit",ru:"здоровье",h:"сущ., ж.р."},
+    {de:"basteln",ru:"мастерить",h:"глагол"},
+    {de:"der Sportverein",ru:"спортивный клуб",h:"сущ., м.р."},
+    {de:"die Enttäuschung",ru:"разочарование",h:"сущ., ж.р."},
+    {de:"die Hoffnung",ru:"надежда",h:"сущ., ж.р."},
+    {de:"die Katastrophe",ru:"катастрофа",h:"сущ., ж.р."},
+    {de:"sympathisch",ru:"симпатичный, приятный",h:"прил."},
+    {de:"der Nationalpark",ru:"национальный парк",h:"сущ., м.р."},
+    {de:"die Strecke",ru:"дистанция, маршрут",h:"сущ., ж.р."},
+    {de:"das Tal",ru:"долина",h:"сущ., ср.р."},
+    {de:"die Temperatur",ru:"температура",h:"сущ., ж.р."},
+    {de:"die Wanderung",ru:"поход, прогулка",h:"сущ., ж.р."},
+    {de:"der Nebel",ru:"туман",h:"сущ., м.р."},
+  ]},
+  {num:10, name:"Дом и жильё", words:[
+    {de:"der Bauernhof",ru:"ферма, крестьянское хозяйство",h:"сущ., м.р."},
+    {de:"die Ferienwohnung",ru:"апартаменты для отдыха",h:"сущ., ж.р."},
+    {de:"das Hausboot",ru:"дом-лодка",h:"сущ., ср.р."},
+    {de:"die Kuh",ru:"корова",h:"сущ., ж.р."},
+    {de:"der Stadtrand",ru:"окраина города",h:"сущ., м.р."},
+    {de:"das Dach",ru:"крыша",h:"сущ., ср.р."},
+    {de:"der Keller",ru:"подвал",h:"сущ., м.р."},
+    {de:"die Kerze",ru:"свеча",h:"сущ., ж.р."},
+    {de:"das Spielzeug",ru:"игрушка",h:"сущ., ср.р."},
+    {de:"einziehen",ru:"въезжать, переезжать",h:"глагол"},
+    {de:"der Mieter",ru:"арендатор, жилец",h:"сущ., м.р."},
+    {de:"kündigen",ru:"расторгать договор",h:"глагол"},
+    {de:"der Briefkasten",ru:"почтовый ящик",h:"сущ., м.р."},
+    {de:"der Bär",ru:"медведь",h:"сущ., м.р."},
+    {de:"der Hase",ru:"заяц",h:"сущ., м.р."},
+    {de:"das Schaf",ru:"овца",h:"сущ., ср.р."},
+    {de:"das Stockwerk",ru:"этаж",h:"сущ., ср.р."},
+    {de:"die Dekoration",ru:"украшение, декор",h:"сущ., ж.р."},
+    {de:"schmücken",ru:"украшать",h:"глагол"},
+  ]},
+  {num:11, name:"Общество и деньги", words:[
+    {de:"verbringen",ru:"проводить (время)",h:"глагол"},
+    {de:"verreisen",ru:"путешествовать, уезжать",h:"глагол"},
+    {de:"die Hausfrau",ru:"домохозяйка",h:"сущ., ж.р."},
+    {de:"der Hausmann",ru:"домохозяин",h:"сущ., м.р."},
+    {de:"sparen",ru:"экономить, копить",h:"глагол"},
+    {de:"die Ehe",ru:"брак",h:"сущ., ж.р."},
+    {de:"entlassen",ru:"увольнять",h:"глагол"},
+    {de:"klingeln",ru:"звонить (в дверь)",h:"глагол"},
+    {de:"das Einkaufszentrum",ru:"торговый центр",h:"сущ., ср.р."},
+    {de:"die Heizung",ru:"отопление",h:"сущ., ж.р."},
+    {de:"der Notfall",ru:"чрезвычайная ситуация",h:"сущ., м.р."},
+    {de:"der Strom",ru:"электричество, ток",h:"сущ., м.р."},
+    {de:"das Gold",ru:"золото",h:"сущ., ср.р."},
+    {de:"das Sprichwort",ru:"пословица",h:"сущ., ср.р."},
+  ]},
+  {num:12, name:"Культура и путешествия", words:[
+    {de:"der König",ru:"король",h:"сущ., м.р."},
+    {de:"die Königin",ru:"королева",h:"сущ., ж.р."},
+    {de:"die Gesellschaft",ru:"общество",h:"сущ., ж.р."},
+    {de:"das Kinderbuch",ru:"детская книга",h:"сущ., ср.р."},
+    {de:"der Roman",ru:"роман",h:"сущ., м.р."},
+    {de:"das Schloss",ru:"замок",h:"сущ., ср.р."},
+    {de:"das Musikfestival",ru:"музыкальный фестиваль",h:"сущ., ср.р."},
+    {de:"die Gebühr",ru:"сбор, пошлина",h:"сущ., ж.р."},
+    {de:"der Rucksack",ru:"рюкзак",h:"сущ., м.р."},
+    {de:"die Übernachtung",ru:"ночёвка, ночлег",h:"сущ., ж.р."},
+    {de:"der Campingplatz",ru:"кемпинг",h:"сущ., м.р."},
+    {de:"die Malerei",ru:"живопись",h:"сущ., ж.р."},
+    {de:"die Bedeutung",ru:"значение, смысл",h:"сущ., ж.р."},
+    {de:"der Titel",ru:"название, заголовок",h:"сущ., м.р."},
+    {de:"die Führung",ru:"экскурсия",h:"сущ., ж.р."},
+    {de:"der Ausblick",ru:"вид, перспектива",h:"сущ., м.р."},
+    {de:"das Werk",ru:"произведение",h:"сущ., ср.р."},
+  ]},
+];
+
+var A2_OFFSET = 10000;
+var WORDS_A2 = [];
+CHAPTERS_A2.forEach(function(ch){
+  ch.words.forEach(function(w){
+    WORDS_A2.push({de:w.de,ru:w.ru,h:w.h,chNum:ch.num,chName:ch.name,globalIdx:A2_OFFSET+WORDS_A2.length});
+  });
+});
+
 // ==================== STATE ====================
+var curVocabSet = 'a1'; // 'a1' or 'a2'
 var selChapter = 0; // 0 = all, else chapter num
 var selMode = 'mc-de';
 var curMode = 'mc-de', curChNum = 0;
@@ -2365,18 +2651,19 @@ var gasUrl = localStorage.getItem('de-gas-url')||'';
 
 // ==================== CHAPTER UI ====================
 function buildChapterGrid(){
+  var activeWords = curVocabSet==='a2' ? WORDS_A2 : WORDS;
+  var activeChapters = curVocabSet==='a2' ? CHAPTERS_A2 : CHAPTERS;
   var grid = document.getElementById('chapter-grid');
   grid.innerHTML = '';
-  // "All" card
   var allCard = document.createElement('div');
   allCard.className = 'ch-card' + (selChapter===0?' selected':'');
   allCard.setAttribute('data-ch','0');
-  allCard.innerHTML = '<div class="ch-num" style="font-size:9px">ВСЕ</div><div class="ch-info"><div class="ch-name">Все главы</div><div class="ch-meta">'+WORDS.length+' слов</div></div>';
+  allCard.innerHTML = '<div class="ch-num" style="font-size:9px">ВСЕ</div><div class="ch-info"><div class="ch-name">Все главы</div><div class="ch-meta">'+activeWords.length+' слов</div></div>';
   allCard.onclick = function(){ pickChapter(0,this); };
   grid.appendChild(allCard);
 
-  CHAPTERS.forEach(function(ch){
-    var wordsInCh = WORDS.filter(function(w){ return w.chNum===ch.num; });
+  activeChapters.forEach(function(ch){
+    var wordsInCh = activeWords.filter(function(w){ return w.chNum===ch.num; });
     var studied = wordsInCh.filter(function(w){ return totalAttempts(w.globalIdx)>0; }).length;
     var newLeft = wordsInCh.length - studied;
     var pct = wordsInCh.length ? Math.round(studied/wordsInCh.length*100) : 0;
@@ -2403,34 +2690,6 @@ function buildChapterGrid(){
     card.onclick = (function(chNum){ return function(){ pickChapter(chNum,card); }; })(ch.num);
     grid.appendChild(card);
   });
-
-  // "Meine Wörter" card — only if user has added custom words
-  if(MY_WORDS.length > 0){
-    var myWordsInW = WORDS.filter(function(w){ return w.chNum===MY_CHAPTER_NUM; });
-    var myStudied = myWordsInW.filter(function(w){ return totalAttempts(w.globalIdx)>0; }).length;
-    var myLeft = myWordsInW.length - myStudied;
-    var myPct = myWordsInW.length ? Math.round(myStudied/myWordsInW.length*100) : 0;
-    var r2=16, circ2=2*Math.PI*r2, dash2=circ2*myPct/100;
-    var myMeta = myStudied+'/'+myWordsInW.length+' изучено';
-    if(myLeft>0) myMeta += ' · <span style="color:#5ee8a0;font-weight:600">'+myLeft+' новых</span>';
-    var myCard = document.createElement('div');
-    myCard.className = 'ch-card' + (selChapter===MY_CHAPTER_NUM?' selected':'');
-    myCard.setAttribute('data-ch', MY_CHAPTER_NUM);
-    myCard.innerHTML =
-      '<div class="ch-num" style="font-size:9px">МОИ</div>'+
-      '<div class="ch-info">'+
-        '<div class="ch-name">✏️ Meine Wörter</div>'+
-        '<div class="ch-meta">'+myMeta+'</div>'+
-      '</div>'+
-      '<div class="ch-prog">'+
-        '<svg width="36" height="36" viewBox="0 0 36 36">'+
-          '<circle cx="18" cy="18" r="'+r2+'" fill="none" stroke="#2e2e3e" stroke-width="3"/>'+
-          '<circle cx="18" cy="18" r="'+r2+'" fill="none" stroke="#5ee8a0" stroke-width="3" stroke-dasharray="'+dash2+' '+(circ2-dash2)+'" stroke-linecap="round"/>'+
-        '</svg>'+
-      '</div>';
-    myCard.onclick = (function(){ return function(){ pickChapter(MY_CHAPTER_NUM,myCard); }; })();
-    grid.appendChild(myCard);
-  }
 }
 
 function pickChapter(chNum, el){
@@ -2450,7 +2709,8 @@ function pickMode(m, el){
 
 // ==================== HOME STATS ====================
 function updateHomeStats(){
-  var pool = selChapter===0 ? WORDS : WORDS.filter(function(w){ return w.chNum===selChapter; });
+  var activeWords = curVocabSet==='a2' ? WORDS_A2 : WORDS;
+  var pool = selChapter===0 ? activeWords : activeWords.filter(function(w){ return w.chNum===selChapter; });
   var studied=0, errTotal=0;
   pool.forEach(function(w){
     var ws=ST[w.globalIdx]||{};
@@ -2514,9 +2774,9 @@ function doSync(){
   var rows = WORDS.map(function(w){
     var ws=ST[w.globalIdx]||{};
     function g(m,f){ return (ws[m]&&ws[m][f])||0; }
-    var ta=['mc-de','mc-ru','audio','letter'].reduce(function(s,m){ return s+g(m,'a'); },0);
-    var te=['mc-de','mc-ru','audio','letter'].reduce(function(s,m){ return s+g(m,'e'); },0);
-    return [w.chName, w.de, w.ru, ta, te, g('mc-de','a'),g('mc-de','e'), g('mc-ru','a'),g('mc-ru','e'), g('audio','a'),g('audio','e'), g('letter','a'),g('letter','e')];
+    var ta=['mc-de','mc-ru','letter'].reduce(function(s,m){ return s+g(m,'a'); },0);
+    var te=['mc-de','mc-ru','letter'].reduce(function(s,m){ return s+g(m,'e'); },0);
+    return [w.chName, w.de, w.ru, ta, te, g('mc-de','a'),g('mc-de','e'), g('mc-ru','a'),g('mc-ru','e'), g('letter','a'),g('letter','e')];
   });
   fetch(gasUrl,{method:'POST',body:JSON.stringify({rows:rows})})
     .then(function(r){ return r.json(); })
@@ -2567,18 +2827,30 @@ function goHome(){
   showScreen('home');
 }
 function showVocabStudy(){
+  curVocabSet = 'a1';
+  selChapter = 0;
+  document.getElementById('vocab-study-title').textContent = 'Учу слова А1';
+  buildChapterGrid();
+  updateHomeStats();
+  showScreen('vocab-study');
+}
+function showVocabA2Study(){
+  curVocabSet = 'a2';
+  selChapter = 0;
+  document.getElementById('vocab-study-title').textContent = 'Учу слова А2';
   buildChapterGrid();
   updateHomeStats();
   showScreen('vocab-study');
 }
 
 // ==================== QUIZ LOGIC ====================
-var MODES=['mc-de','mc-ru','audio','letter'];
-var ML={'mc-de':'🇩🇪 DE','mc-ru':'🇷🇺 RU','audio':'🔊 Слух','letter':'🔤 Буквы','all':'🎯 Микс','conj-word':'🔤 Слово','conj-phrase':'📝 Фраза','conj-write':'✍️ Напиши','conj-all':'🎯 Все типы','gender-mc':'⚥ Род','gender-letter':'🔤 Слово','gender-write':'✍️ Напиши','gender-all':'🎯 Все типы','past-write':'✍️ Напиши','past-mc':'🔤 Выбери','past-letter':'🔡 Буквы','past-all':'🎯 Все типы'};
-var BDCLS={'mc-de':'bd1','mc-ru':'bd2','audio':'bd3','letter':'bd4','all':'bd1','conj-word':'bd4','conj-phrase':'bd2','conj-write':'bd3','conj-all':'bd1','gender-mc':'bd2','gender-letter':'bd4','gender-write':'bd3','gender-all':'bd1','past-write':'bd3','past-mc':'bd2','past-letter':'bd4','past-all':'bd1'};
+var MODES=['mc-de','mc-ru','letter'];
+var ML={'mc-de':'🇩🇪 DE','mc-ru':'🇷🇺 RU','letter':'🔤 Буквы','all':'🎯 Микс','conj-word':'🔤 Слово','conj-phrase':'📝 Фраза','conj-write':'✍️ Напиши','conj-all':'🎯 Все типы','gender-mc':'⚥ Род','gender-letter':'🔤 Слово','gender-write':'✍️ Напиши','gender-all':'🎯 Все типы','past-write':'✍️ Напиши','past-mc':'🔤 Выбери','past-letter':'🔡 Буквы','past-all':'🎯 Все типы'};
+var BDCLS={'mc-de':'bd1','mc-ru':'bd2','letter':'bd4','all':'bd1','conj-word':'bd4','conj-phrase':'bd2','conj-write':'bd3','conj-all':'bd1','gender-mc':'bd2','gender-letter':'bd4','gender-write':'bd3','gender-all':'bd1','past-write':'bd3','past-mc':'bd2','past-letter':'bd4','past-all':'bd1'};
 
 function getPool(){
-  return selChapter===0 ? WORDS : WORDS.filter(function(w){ return w.chNum===selChapter; });
+  var activeWords = curVocabSet==='a2' ? WORDS_A2 : WORDS;
+  return selChapter===0 ? activeWords : activeWords.filter(function(w){ return w.chNum===selChapter; });
 }
 
 function buildQuestions(mode, count){
@@ -2607,7 +2879,7 @@ function buildQuestions(mode, count){
 
   working = working.slice(0, Math.min(count, working.length));
   return working.map(function(w){
-    var m = mode==='all' ? MODES[Math.floor(Math.random()*4)] : mode;
+    var m = mode==='all' ? MODES[Math.floor(Math.random()*MODES.length)] : mode;
     return {w:w, m:m};
   });
 }
@@ -2638,7 +2910,6 @@ function renderQ(){
   document.getElementById('pfill').style.width=(qi/qs.length*100)+'%';
   document.getElementById('qsc').textContent='✓ '+score;
   document.getElementById('opts').innerHTML=''; document.getElementById('opts').style.display='';
-  document.getElementById('audio-area').style.display='none';
   document.getElementById('letter-area').style.display='none';
   document.getElementById('write-area').style.display='none';
   document.getElementById('write-input').value='';
@@ -2660,13 +2931,6 @@ function renderQ(){
     document.getElementById('qword').textContent=w.ru;
     document.getElementById('qhint').textContent='';
     renderMC('de',w);
-  } else if(m==='audio'){
-    document.getElementById('qtype').textContent='ПОСЛУШАЙ И ПЕРЕВЕДИ';
-    document.getElementById('qword').textContent='';
-    document.getElementById('qhint').textContent='';
-    document.getElementById('audio-area').style.display='block';
-    setTimeout(speak,400);
-    renderMC('ru',w);
   } else if(m==='conj-word'){
     document.getElementById('qtype').textContent='СОСТАВЬ СЛОВО ПО-НЕМЕЦКИ';
     document.getElementById('qword').textContent=w.ru;
@@ -2720,7 +2984,7 @@ function renderQ(){
   } else if(m==='past-write'){
     document.getElementById('qtype').textContent='НАПИШИ PARTIZIP II';
     document.getElementById('qword').textContent=w.de;
-    document.getElementById('qhint').textContent='прошедшее время';
+    document.getElementById('qhint').textContent=w.ru;
     document.getElementById('opts').style.display='none';
     document.getElementById('write-area').style.display='block';
     document.getElementById('write-input').placeholder='Partizip II…';
@@ -2759,8 +3023,9 @@ function renderMC(lang, targetW){
   var area=document.getElementById('opts'); area.innerHTML='';
   var cv=lang==='ru'?targetW.ru:targetW.de;
   // Get distractors from same chapter if possible, else from all
+  var allActive = curVocabSet==='a2' ? WORDS_A2 : WORDS;
   var pool = getPool().filter(function(w){ return w.globalIdx!==targetW.globalIdx; });
-  if(pool.length<3) pool = WORDS.filter(function(w){ return w.globalIdx!==targetW.globalIdx; });
+  if(pool.length<3) pool = allActive.filter(function(w){ return w.globalIdx!==targetW.globalIdx; });
   var distractors = pool.sort(function(){ return Math.random()-.5; }).slice(0,3).map(function(d){ return lang==='ru'?d.ru:d.de; });
   var opts=[cv].concat(distractors).sort(function(){ return Math.random()-.5; });
   ['A','B','C','D'].forEach(function(l,i){
@@ -3210,7 +3475,7 @@ function showResults(){
 // ==================== STATS PAGE ====================
 function showStats(){
   // ── vocab summary ──
-  var tot=0,ok=0,te=0,bm={'mc-de':0,'mc-ru':0,'audio':0,'letter':0};
+  var tot=0,ok=0,te=0,bm={'mc-de':0,'mc-ru':0,'letter':0};
   Object.values(ST).forEach(function(ms){
     Object.entries(ms).forEach(function(x){
       var m=x[0],d=x[1]; tot+=d.a; ok+=d.a-d.e; te+=d.e;
@@ -3222,7 +3487,6 @@ function showStats(){
   document.getElementById('st-err').textContent=te;
   document.getElementById('sm-de').textContent=bm['mc-de'];
   document.getElementById('sm-ru').textContent=bm['mc-ru'];
-  document.getElementById('sm-au').textContent=bm['audio'];
   document.getElementById('sm-lt').textContent=bm['letter'];
   document.getElementById('syncsb').style.display=gasUrl?'block':'none';
   // ── conj summary ──
@@ -3307,10 +3571,10 @@ function renderWList(f){
     var ws=ST[w.globalIdx]||{};
     var te=totalErrs(w.globalIdx), ta=totalAttempts(w.globalIdx);
     if(f==='errors'&&te===0) return;
-    if(['mc-de','mc-ru','audio','letter'].indexOf(f)>=0&&(!ws[f]||ws[f].a===0)) return;
+    if(['mc-de','mc-ru','letter'].indexOf(f)>=0&&(!ws[f]||ws[f].a===0)) return;
     var row=document.createElement('div'); row.className='wrow';
-    var ics={'mc-de':'🇩🇪','mc-ru':'🇷🇺','audio':'🔊','letter':'🔤'};
-    var cls={'mc-de':'t1','mc-ru':'t2','audio':'t3','letter':'t4'};
+    var ics={'mc-de':'🇩🇪','mc-ru':'🇷🇺','letter':'🔤'};
+    var cls={'mc-de':'t1','mc-ru':'t2','letter':'t4'};
     var badges=MODES.map(function(m){
       var d=ws[m]; if(!d||!d.a) return '';
       return '<span class="wtb '+cls[m]+'">'+ics[m]+' '+d.e+'/'+d.a+'</span>';
@@ -3366,59 +3630,6 @@ function renderGenderStatList(f){
     list.appendChild(row);
   });
   if(!list.innerHTML) list.innerHTML='<div style="color:#44445a;text-align:center;padding:28px;font-size:13px">Нет данных — начни тренировку!</div>';
-}
-
-// ==================== MY WORDS ====================
-function showAddWords(){
-  renderMyWordsList();
-  showScreen('add-words');
-}
-
-function renderMyWordsList(){
-  var list = document.getElementById('my-words-list');
-  if(!MY_WORDS.length){
-    list.innerHTML='<div style="color:#44445a;text-align:center;padding:40px;font-size:14px">Пока нет слов.<br>Нажми + Добавить</div>';
-    return;
-  }
-  list.innerHTML='';
-  MY_WORDS.forEach(function(w,i){
-    var row=document.createElement('div');
-    row.className='wrow';
-    row.style.marginBottom='6px';
-    row.innerHTML='<div style="flex:1"><div class="wde">'+w.de+'</div><div class="wru">'+w.ru+(w.h?'<span style="color:#44445a;font-size:10px;margin-left:6px">'+w.h+'</span>':'')+'</div></div>'+
-      '<button onclick="deleteMyWord('+i+')" style="background:none;border:none;color:#44445a;cursor:pointer;font-size:16px;padding:4px 8px">✕</button>';
-    list.appendChild(row);
-  });
-}
-
-function showAddForm(){
-  document.getElementById('new-de').value='';
-  document.getElementById('new-ru').value='';
-  document.getElementById('new-hint').value='';
-  document.getElementById('add-word-error').style.display='none';
-  showScreen('add-word-form');
-}
-
-function saveNewWord(){
-  var de=document.getElementById('new-de').value.trim();
-  var ru=document.getElementById('new-ru').value.trim();
-  var h=document.getElementById('new-hint').value.trim();
-  var err=document.getElementById('add-word-error');
-  if(!de||!ru){ err.textContent='Заполни оба поля!'; err.style.display='block'; return; }
-  MY_WORDS.push({de:de,ru:ru,h:h});
-  localStorage.setItem('de-mywords',JSON.stringify(MY_WORDS));
-  rebuildMyWords();
-  buildChapterGrid();
-  showAddWords();
-}
-
-function deleteMyWord(idx){
-  if(!confirm('Удалить слово «'+MY_WORDS[idx].de+'»?')) return;
-  MY_WORDS.splice(idx,1);
-  localStorage.setItem('de-mywords',JSON.stringify(MY_WORDS));
-  rebuildMyWords();
-  buildChapterGrid();
-  renderMyWordsList();
 }
 
 // ==================== INIT ====================
