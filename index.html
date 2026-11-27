@@ -394,12 +394,13 @@ html,body{background:#0a0a0f;color:#e8e8f0;font-family:'DM Sans',sans-serif;min-
     <div class="mode-grid2" id="past-mode-grid">
       <div class="mode-card selected" onclick="pickPastMode('past-write',this)"><div class="mc-icon">✍️</div><div class="mc-name">Напиши</div><div class="mc-desc">Инфинитив → напиши Partizip II</div></div>
       <div class="mode-card" onclick="pickPastMode('past-mc',this)"><div class="mc-icon">🔤</div><div class="mc-name">Выбери</div><div class="mc-desc">Перевод → выбери инфинитив</div></div>
+      <div class="mode-card" onclick="pickPastMode('past-letter-pi',this)"><div class="mc-icon">🔡</div><div class="mc-name">Буквы</div><div class="mc-desc">Инфинитив → Partizip II из букв</div></div>
     </div>
     <div class="mode-all" style="margin-bottom:8px">
-      <div class="mode-card" onclick="pickPastMode('past-letter',this)"><div class="mc-icon">🔡</div><div class="mc-name">Буквы</div><div class="mc-desc">Перевод → составь инфинитив и Partizip II</div></div>
+      <div class="mode-card" onclick="pickPastMode('past-letter',this)"><div class="mc-icon">🔡🔡</div><div class="mc-name">Буквы+</div><div class="mc-desc">Перевод → инфинитив и Partizip II из букв</div></div>
     </div>
     <div class="mode-all">
-      <div class="mode-card" onclick="pickPastMode('past-all',this)"><div class="mc-icon">🎯</div><div class="mc-name">Все типы</div><div class="mc-desc">Смешанный — все 3 типа заданий</div></div>
+      <div class="mode-card" onclick="pickPastMode('past-all',this)"><div class="mc-icon">🎯</div><div class="mc-name">Все типы</div><div class="mc-desc">Смешанный — все 4 типа заданий</div></div>
     </div>
     <button class="btn btn-red" onclick="startPastQuiz()">Начать</button>
   </div>
@@ -2924,8 +2925,8 @@ function showVocabA2Study(){
 
 // ==================== QUIZ LOGIC ====================
 var MODES=['mc-de','mc-ru','letter'];
-var ML={'mc-de':'🇩🇪 DE','mc-ru':'🇷🇺 RU','letter':'🔤 Буквы','all':'🎯 Микс','conj-word':'🔤 Слово','conj-phrase':'📝 Фраза','conj-write':'✍️ Напиши','conj-all':'🎯 Все типы','gender-mc':'⚥ Род','gender-letter':'🔤 Слово','gender-write':'✍️ Напиши','gender-all':'🎯 Все типы','past-write':'✍️ Напиши','past-mc':'🔤 Выбери','past-letter':'🔡 Буквы','past-all':'🎯 Все типы'};
-var BDCLS={'mc-de':'bd1','mc-ru':'bd2','letter':'bd4','all':'bd1','conj-word':'bd4','conj-phrase':'bd2','conj-write':'bd3','conj-all':'bd1','gender-mc':'bd2','gender-letter':'bd4','gender-write':'bd3','gender-all':'bd1','past-write':'bd3','past-mc':'bd2','past-letter':'bd4','past-all':'bd1'};
+var ML={'mc-de':'🇩🇪 DE','mc-ru':'🇷🇺 RU','letter':'🔤 Буквы','all':'🎯 Микс','conj-word':'🔤 Слово','conj-phrase':'📝 Фраза','conj-write':'✍️ Напиши','conj-all':'🎯 Все типы','gender-mc':'⚥ Род','gender-letter':'🔤 Слово','gender-write':'✍️ Напиши','gender-all':'🎯 Все типы','past-write':'✍️ Напиши','past-mc':'🔤 Выбери','past-letter-pi':'🔡 Буквы','past-letter':'🔡 Буквы+','past-all':'🎯 Все типы'};
+var BDCLS={'mc-de':'bd1','mc-ru':'bd2','letter':'bd4','all':'bd1','conj-word':'bd4','conj-phrase':'bd2','conj-write':'bd3','conj-all':'bd1','gender-mc':'bd2','gender-letter':'bd4','gender-write':'bd3','gender-all':'bd1','past-write':'bd3','past-mc':'bd2','past-letter-pi':'bd4','past-letter':'bd4','past-all':'bd1'};
 
 function getPool(){
   var activeWords = curVocabSet==='a2' ? WORDS_A2 : WORDS;
@@ -3074,6 +3075,14 @@ function renderQ(){
     document.getElementById('qhint').textContent='инфинитив';
     document.getElementById('opts').style.display='grid';
     renderPastMC(w);
+  } else if(m==='past-letter-pi'){
+    document.getElementById('qtype').textContent='СОСТАВЬ PARTIZIP II';
+    document.getElementById('qword').textContent=w.de;
+    document.getElementById('qhint').textContent=w.ru;
+    document.getElementById('opts').style.display='none';
+    document.getElementById('letter-area').style.display='block';
+    curW.verbForm = w.part;
+    initLetters(w.part);
   } else if(m==='past-letter-inf'){
     document.getElementById('qtype').textContent='СОСТАВЬ ИНФИНИТИВ';
     document.getElementById('qword').textContent=w.ru;
@@ -3178,10 +3187,11 @@ function checkLetters(){
   document.getElementById('chkbtn').disabled=true;
   if(curW.globalIdx!=null) rec(curW.globalIdx,curQMode,!ok);
   else if(curQMode==='gender-letter') recGender(curW.origDe, !ok);
-  else if(curQMode==='past-letter-inf'||curQMode==='past-letter-part') recPast(curW.inf, !ok);
+  else if(curQMode==='past-letter-inf'||curQMode==='past-letter-part'||curQMode==='past-letter-pi') recPast(curW.inf, !ok);
   else recConj(curW.de, !ok);
+  var fbAns = curW.verbForm !== undefined ? curW.verbForm : curW.de;
   if(ok){ score++; showFB(true,'Правильно! 🎉'); document.querySelectorAll('#lans .ltile').forEach(function(t){ t.classList.remove('placed'); t.classList.add('ok'); }); }
-  else { errs++; showFB(false,'Неверно. Правильный ответ: '+curW.de); document.querySelectorAll('#lans .ltile').forEach(function(t){ t.classList.remove('placed'); t.classList.add('bad'); }); }
+  else { errs++; showFB(false,'Неверно. Правильный ответ: '+fbAns); document.querySelectorAll('#lans .ltile').forEach(function(t){ t.classList.remove('placed'); t.classList.add('bad'); }); }
   document.getElementById('nxtbtn').classList.add('show');
 }
 
@@ -3403,6 +3413,8 @@ function buildPastQuestions(mode, count){
     return pool.slice(0,count).map(function(v){ return {w:makeW(v), m:'past-write'}; });
   } else if(mode==='past-mc'){
     return pool.slice(0,count).map(function(v){ return {w:makeW(v), m:'past-mc'}; });
+  } else if(mode==='past-letter-pi'){
+    return pool.slice(0,count).map(function(v){ return {w:makeW(v), m:'past-letter-pi'}; });
   } else if(mode==='past-letter'){
     var qs=[]; pool.slice(0,Math.ceil(count/2)).forEach(function(v){
       var base=makeW(v);
@@ -3414,8 +3426,9 @@ function buildPastQuestions(mode, count){
     var result=[];
     pool.forEach(function(v){
       var r=Math.random();
-      if(r<0.33){ result.push({w:makeW(v),m:'past-write'}); }
-      else if(r<0.66){ result.push({w:makeW(v),m:'past-mc'}); }
+      if(r<0.25){ result.push({w:makeW(v),m:'past-write'}); }
+      else if(r<0.5){ result.push({w:makeW(v),m:'past-mc'}); }
+      else if(r<0.75){ result.push({w:makeW(v),m:'past-letter-pi'}); }
       else {
         var base=makeW(v);
         result.push({w:Object.assign({},base,{de:v.inf}),  m:'past-letter-inf'});
