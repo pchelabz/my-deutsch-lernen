@@ -2259,6 +2259,24 @@ var GENDER_PACKS = [
   });
 })();
 
+// Auto-generate A2 gender packs from CHAPTERS_A2 data (skip ch.13 — has manual pack num:30)
+(function(){
+  CHAPTERS_A2.forEach(function(ch){
+    if(ch.num === 13) return;
+    var nouns = ch.words.filter(function(w){
+      return w.h && w.h.indexOf('сущ.') >= 0 &&
+             w.h.indexOf('мн.ч.') < 0 &&
+             /^(die|der|das) /.test(w.de);
+    }).map(function(w){
+      var sp = w.de.indexOf(' ');
+      return {de: w.de.slice(sp+1), ru: w.ru, art: w.de.slice(0, sp)};
+    });
+    if(nouns.length > 0){
+      GENDER_PACKS.push({num: 30+ch.num, name: 'А2-Гл.'+ch.num+': '+ch.name, words: nouns});
+    }
+  });
+})();
+
 // ==================== PAST VERBS ====================
 var PAST_VERBS = [
   {inf:"bleiben",    infFull:"bleiben",            prat:"blieb",    part:"geblieben",   ru:"оставаться"},
@@ -2424,6 +2442,39 @@ var CHAPTERS_A2 = [
     {de:"die Fremdsprache",ru:"иностранный язык",h:"сущ., ж.р."},
     {de:"jobben",ru:"работать (подработка)",h:"глагол"},
     {de:"die Vorbereitung",ru:"подготовка",h:"сущ., ж.р."},
+    {de:"die Übung",ru:"упражнение",h:"сущ., ж.р."},
+    {de:"der Erzieher",ru:"воспитатель",h:"сущ., м.р."},
+    {de:"die Entscheidung",ru:"решение",h:"сущ., ж.р."},
+    {de:"die Unterstützung",ru:"поддержка",h:"сущ., ж.р."},
+    {de:"der Grund",ru:"причина, основание",h:"сущ., м.р."},
+    {de:"der Professor",ru:"профессор",h:"сущ., м.р."},
+    {de:"der Lehrer",ru:"учитель",h:"сущ., м.р."},
+    {de:"die Universität",ru:"университет",h:"сущ., ж.р."},
+    {de:"ein Praktikum machen",ru:"проходить стажировку",h:"выражение"},
+    {de:"der Mitarbeiter",ru:"сотрудник, коллега",h:"сущ., м.р."},
+    {de:"die Note",ru:"оценка",h:"сущ., ж.р."},
+    {de:"der Student",ru:"студент",h:"сущ., м.р."},
+    {de:"die Lehre",ru:"учение, преподавание",h:"сущ., ж.р."},
+    {de:"das Fach",ru:"предмет",h:"сущ., ср.р."},
+    {de:"der Unterricht",ru:"занятие, урок",h:"сущ., м.р."},
+    {de:"der Auszubildende",ru:"ученик, стажёр",h:"сущ., м.р."},
+    {de:"die Bewerbung",ru:"заявление на вакансию",h:"сущ., ж.р."},
+    {de:"die Krippe",ru:"ясли",h:"сущ., ж.р."},
+    {de:"verdienen",ru:"зарабатывать",h:"глагол"},
+    {de:"wechseln",ru:"менять",h:"глагол"},
+    {de:"der Studienplatz",ru:"место учёбы",h:"сущ., м.р."},
+    {de:"die Messe",ru:"ярмарка",h:"сущ., ж.р."},
+    {de:"bekommen",ru:"получать",h:"глагол"},
+    {de:"der Lebenslauf",ru:"резюме, биография",h:"сущ., м.р."},
+    {de:"das Anschreiben",ru:"сопроводительное письмо",h:"сущ., ср.р."},
+    {de:"die Vorschule",ru:"подготовительная школа",h:"сущ., ж.р."},
+    {de:"die Krankenschwester",ru:"медсестра",h:"сущ., ж.р."},
+    {de:"das Au-pair",ru:"Au-pair (помощник по дому)",h:"сущ., ср.р."},
+    {de:"der Hotelkaufmann",ru:"менеджер гостиницы",h:"сущ., м.р."},
+    {de:"die Zeitschrift",ru:"журнал",h:"сущ., ж.р."},
+    {de:"der Abschluss",ru:"окончание, завершение",h:"сущ., м.р."},
+    {de:"das Lieblingsfach",ru:"любимый предмет",h:"сущ., ср.р."},
+    {de:"für die Zukunft",ru:"на будущее",h:"выражение"},
   ]},
   {num:3, name:"Медиа и технологии", words:[
     {de:"chatten",ru:"общаться в чате",h:"глагол"},
@@ -2456,6 +2507,26 @@ var CHAPTERS_A2 = [
     {de:"der Witz",ru:"шутка, анекдот",h:"сущ., м.р."},
     {de:"lachen",ru:"смеяться",h:"глагол"},
     {de:"weinen",ru:"плакать",h:"глагол"},
+    {de:"stark",ru:"сильный",h:"прил."},
+    {de:"jung",ru:"молодой",h:"прил."},
+    {de:"hart",ru:"жёсткий, трудный",h:"прил."},
+    {de:"schwer",ru:"тяжёлый, серьёзный, трудный",h:"прил."},
+    {de:"nah",ru:"близкий",h:"прил."},
+    {de:"arg",ru:"злой, плохой",h:"прил."},
+    {de:"arm",ru:"бедный",h:"прил."},
+    {de:"schwarz",ru:"чёрный",h:"прил."},
+    {de:"grob",ru:"грубый",h:"прил."},
+    {de:"gesund",ru:"здоровый",h:"прил."},
+    {de:"klug",ru:"умный",h:"прил."},
+    {de:"leicht",ru:"лёгкий",h:"прил."},
+    {de:"echt",ru:"настоящий, подлинный",h:"прил."},
+    {de:"ehrlich",ru:"честный",h:"прил."},
+    {de:"ehrlich gesagt",ru:"честно говоря",h:"выражение"},
+    {de:"wenig",ru:"мало, немного",h:"прил./нареч."},
+    {de:"berühmt",ru:"известный, знаменитый",h:"прил."},
+    {de:"zufrieden",ru:"довольный, удовлетворённый",h:"прил."},
+    {de:"verboten",ru:"запрещённый",h:"прил."},
+    {de:"weit",ru:"далёкий, широкий",h:"прил."},
   ]},
   {num:4, name:"Чувства и события", words:[
     {de:"aufgeregt",ru:"взволнованный",h:"прил."},
@@ -2723,6 +2794,14 @@ var qs=[], qi=0, score=0, errs=0, answered=false;
 var t0=null, curW=null, curQMode='', curAns='';
 var placed=[], curStatFilter='all', curStatSection='vocab', curConjFilter='all', curGenderFilter='all', curPastFilter='all';
 var selConjMode='conj-word', selGenderMode='gender-mc', selGenderPack=0, selPastMode='past-write';
+function shuffle(arr){
+  for(var i=arr.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var t=arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+  return arr;
+}
+
 var ST = JSON.parse(localStorage.getItem('de-st2')||'{}');
 var CONJ_ST   = JSON.parse(localStorage.getItem('de-conj-st')||'{}');
 var GENDER_ST = JSON.parse(localStorage.getItem('de-gender-st')||'{}');
@@ -2944,7 +3023,7 @@ function buildQuestions(mode, count){
   var working;
   if(unseen.length > 0){
     // New words first: only pick from unseen, shuffled randomly
-    working = unseen.slice().sort(function(){ return Math.random()-.5; });
+    working = shuffle(unseen.slice());
   } else {
     // All words seen — repeat mode: sort by most errors first
     working = seen.slice().sort(function(a,b){
@@ -2954,7 +3033,7 @@ function buildQuestions(mode, count){
 
   // Safety: need ≥4 words for MC distractors
   if(working.length < 4){
-    working = pool.slice().sort(function(){ return Math.random()-.5; });
+    working = shuffle(pool.slice());
   }
 
   working = working.slice(0, Math.min(count, working.length));
@@ -3006,6 +3085,7 @@ function renderQ(){
     document.getElementById('qword').textContent=w.de;
     document.getElementById('qhint').textContent=w.h?w.h:'';
     renderMC('ru',w);
+    setTimeout(function(){ safeSpeak(curW.speakText||curW.de); }, 500);
   } else if(m==='mc-de'){
     document.getElementById('qtype').textContent='КАК БУДЕТ ПО-НЕМЕЦКИ?';
     document.getElementById('qword').textContent=w.ru;
@@ -3069,6 +3149,7 @@ function renderQ(){
     document.getElementById('write-area').style.display='block';
     document.getElementById('write-input').placeholder='Partizip II…';
     setTimeout(function(){ document.getElementById('write-input').focus(); }, 100);
+    setTimeout(function(){ safeSpeak(curW.de); }, 500);
   } else if(m==='past-mc'){
     document.getElementById('qtype').textContent='КАК ЗВУЧИТ ПО-НЕМЕЦКИ?';
     document.getElementById('qword').textContent=w.ru;
@@ -3082,7 +3163,9 @@ function renderQ(){
     document.getElementById('opts').style.display='none';
     document.getElementById('letter-area').style.display='block';
     curW.verbForm = w.part;
+    curW.speakText = w.part;
     initLetters(w.part);
+    setTimeout(function(){ safeSpeak(curW.de); }, 500);
   } else if(m==='past-letter-inf'){
     document.getElementById('qtype').textContent='СОСТАВЬ ИНФИНИТИВ';
     document.getElementById('qword').textContent=w.ru;
@@ -3114,8 +3197,8 @@ function renderMC(lang, targetW){
   var allActive = curVocabSet==='a2' ? WORDS_A2 : WORDS;
   var pool = getPool().filter(function(w){ return w.globalIdx!==targetW.globalIdx; });
   if(pool.length<3) pool = allActive.filter(function(w){ return w.globalIdx!==targetW.globalIdx; });
-  var distractors = pool.sort(function(){ return Math.random()-.5; }).slice(0,3).map(function(d){ return lang==='ru'?d.ru:d.de; });
-  var opts=[cv].concat(distractors).sort(function(){ return Math.random()-.5; });
+  var distractors = shuffle(pool.slice()).slice(0,3).map(function(d){ return lang==='ru'?d.ru:d.de; });
+  var opts=shuffle([cv].concat(distractors));
   ['A','B','C','D'].forEach(function(l,i){
     if(i>=opts.length) return;
     var btn=document.createElement('button'); btn.className='opt';
@@ -3145,7 +3228,7 @@ function initLetters(word){
   placed=[];
   // Only use the actual letters of the word (+ space tiles if word has spaces)
   var pool=word.split('').map(function(c,i){ return{c:c,id:i,p:false}; });
-  pool.sort(function(){ return Math.random()-.5; });
+  shuffle(pool);
   window._lp=pool;
   document.getElementById('lans').innerHTML='<span style="color:#44445a;font-size:12px">Нажимай буквы ниже…</span>';
   curAns=''; document.getElementById('chkbtn').disabled=true;
@@ -3195,9 +3278,25 @@ function checkLetters(){
   document.getElementById('nxtbtn').classList.add('show');
 }
 
+function safeSpeak(txt){
+  if(!window.speechSynthesis||!txt) return;
+  try{
+    if(speechSynthesis.paused) speechSynthesis.resume();
+    speechSynthesis.cancel();
+    setTimeout(function(){
+      try{
+        var u=new SpeechSynthesisUtterance(txt);
+        u.lang='de-DE'; u.rate=0.85;
+        u.onerror=function(){};
+        speechSynthesis.speak(u);
+      }catch(e){}
+    },80);
+  }catch(e){}
+}
+
 function showFB(ok,msg){
   var f=document.getElementById('fb'); f.textContent=msg; f.className='fb '+(ok?'correct':'wrong');
-  if(curW){ var txt=curW.speakText||curW.de; setTimeout(function(){ var u=new SpeechSynthesisUtterance(txt); u.lang='de-DE'; u.rate=0.85; speechSynthesis.cancel(); speechSynthesis.speak(u); }, 350); }
+  if(curW){ setTimeout(function(){ safeSpeak(curW.speakText||curW.de); }, 300); }
 }
 
 function nextQ(){
@@ -3207,18 +3306,6 @@ function nextQ(){
   renderQ();
 }
 
-function speak(){
-  if(!curW) return;
-  var b=document.getElementById('abtn');
-  b.classList.remove('speaking');
-  b.classList.add('speaking');
-  var u=new SpeechSynthesisUtterance(curW.speakText||curW.de);
-  u.lang='de-DE'; u.rate=0.85;
-  u.onend=function(){ b.classList.remove('speaking'); };
-  u.onerror=function(){ b.classList.remove('speaking'); };
-  speechSynthesis.cancel();
-  speechSynthesis.speak(u);
-}
 
 // ==================== CONJUGATION QUIZ ====================
 function updateConjProgress(){
@@ -3254,7 +3341,7 @@ function conjErrs(de){ return CONJ_ST[de] ? CONJ_ST[de].e : 0; }
 function unseenFirst(pool){
   var unseen = pool.filter(function(x){ return !conjSeen(x.de); });
   var seen   = pool.filter(function(x){ return  conjSeen(x.de); });
-  if(unseen.length > 0) return unseen.slice().sort(function(){ return Math.random()-.5; });
+  if(unseen.length > 0) return shuffle(unseen.slice());
   return seen.slice().sort(function(a,b){ return conjErrs(b.de)-conjErrs(a.de)+(Math.random()-.5); });
 }
 function buildConjQuestions(mode, count){
@@ -3279,7 +3366,7 @@ function buildConjQuestions(mode, count){
     wSeen.forEach(function(w){ allSeen.push({w:{de:w.de,ru:w.ru,globalIdx:null},m:'conj-word'}); });
     pSeen.forEach(function(p){ allSeen.push({w:{de:p.de,ru:p.ru,globalIdx:null},m:Math.random()<.5?'conj-phrase':'conj-write'}); });
     var working = allUnseen.length > 0 ? allUnseen : allSeen;
-    working.sort(function(){ return Math.random()-.5; });
+    shuffle(working);
     return working.slice(0,count);
   }
 }
@@ -3298,7 +3385,7 @@ function unseenFirstGender(){
   var words = curPackWords();
   var unseen = words.filter(function(w){ return !genderSeen(w.de); });
   var seen   = words.filter(function(w){ return  genderSeen(w.de); });
-  if(unseen.length > 0) return unseen.slice().sort(function(){ return Math.random()-.5; });
+  if(unseen.length > 0) return shuffle(unseen.slice());
   return seen.slice().sort(function(a,b){ return genderErrs(b.de)-genderErrs(a.de)+(Math.random()-.5); });
 }
 function buildGenderQuestions(mode, count){
@@ -3402,7 +3489,7 @@ function pastErrs(inf){ return PAST_ST[inf] ? PAST_ST[inf].e : 0; }
 function unseenFirstPast(){
   var unseen=PAST_VERBS.filter(function(v){ return !pastSeen(v.inf); });
   var seen  =PAST_VERBS.filter(function(v){ return  pastSeen(v.inf); });
-  if(unseen.length>0) return unseen.slice().sort(function(){ return Math.random()-.5; });
+  if(unseen.length>0) return shuffle(unseen.slice());
   return seen.slice().sort(function(a,b){ return pastErrs(b.inf)-pastErrs(a.inf)+(Math.random()-.5); });
 }
 function buildPastQuestions(mode, count){
@@ -3435,7 +3522,7 @@ function buildPastQuestions(mode, count){
         result.push({w:Object.assign({},base,{de:v.part}), m:'past-letter-part'});
       }
     });
-    result.sort(function(){ return Math.random()-.5; });
+    shuffle(result);
     return result.slice(0,count);
   }
 }
@@ -3470,8 +3557,8 @@ function renderPastMC(targetW){
   var area=document.getElementById('opts'); area.innerHTML='';
   var cv=targetW.de;
   var pool=PAST_VERBS.filter(function(v){ return v.inf!==targetW.inf; });
-  var distractors=pool.sort(function(){ return Math.random()-.5; }).slice(0,3).map(function(v){ return v.infFull; });
-  var opts=[cv].concat(distractors).sort(function(){ return Math.random()-.5; });
+  var distractors=shuffle(pool.slice()).slice(0,3).map(function(v){ return v.infFull; });
+  var opts=shuffle([cv].concat(distractors));
   ['A','B','C','D'].forEach(function(l,i){
     if(i>=opts.length) return;
     var btn=document.createElement('button'); btn.className='opt';
