@@ -2369,7 +2369,6 @@ var CHAPTERS_A2 = [
     {de:"heiraten",ru:"жениться / выходить замуж",h:"глагол"},
     {de:"die Hochzeit",ru:"свадьба",h:"сущ., ж.р."},
     {de:"mieten",ru:"снимать (жильё)",h:"глагол"},
-    {de:"die Note",ru:"оценка",h:"сущ., ж.р."},
     {de:"organisieren",ru:"организовывать",h:"глагол"},
     {de:"romantisch",ru:"романтичный",h:"прил."},
     {de:"spannend",ru:"увлекательный",h:"прил."},
@@ -2383,7 +2382,6 @@ var CHAPTERS_A2 = [
     {de:"gemeinsam",ru:"вместе, совместно",h:"прил./нареч."},
     {de:"der Platz",ru:"место, площадь",h:"сущ., м.р."},
     {de:"die Angst",ru:"страх",h:"сущ., ж.р."},
-    {de:"das Handy",ru:"мобильный телефон",h:"сущ., ср.р."},
     {de:"die Reservierung",ru:"бронирование",h:"сущ., ж.р."},
     {de:"der Aufenthalt",ru:"пребывание",h:"сущ., м.р."},
     {de:"bitter",ru:"горький",h:"прил."},
@@ -2453,7 +2451,6 @@ var CHAPTERS_A2 = [
     {de:"die Krankenschwester",ru:"медсестра",h:"сущ., ж.р."},
     {de:"das Au-pair",ru:"Au-pair (помощник по дому)",h:"сущ., ср.р."},
     {de:"der Hotelkaufmann",ru:"менеджер гостиницы",h:"сущ., м.р."},
-    {de:"die Zeitschrift",ru:"журнал",h:"сущ., ж.р."},
     {de:"der Abschluss",ru:"окончание, завершение",h:"сущ., м.р."},
     {de:"das Lieblingsfach",ru:"любимый предмет",h:"сущ., ср.р."},
     {de:"für die Zukunft",ru:"на будущее",h:"выражение"},
@@ -2462,15 +2459,10 @@ var CHAPTERS_A2 = [
     {de:"chatten",ru:"общаться в чате",h:"глагол"},
     {de:"downloaden",ru:"скачивать",h:"глагол"},
     {de:"der Link",ru:"ссылка",h:"сущ., м.р."},
-    {de:"das Radio",ru:"радио",h:"сущ., ср.р."},
-    {de:"die Webseite",ru:"веб-сайт",h:"сущ., ж.р."},
     {de:"das E-Book",ru:"электронная книга",h:"сущ., ср.р."},
     {de:"der Laptop",ru:"ноутбук",h:"сущ., м.р."},
     {de:"das Smartphone",ru:"смартфон",h:"сущ., ср.р."},
-    {de:"der Bildschirm",ru:"экран",h:"сущ., м.р."},
     {de:"das Kabel",ru:"кабель",h:"сущ., ср.р."},
-    {de:"die Tastatur",ru:"клавиатура",h:"сущ., ж.р."},
-    {de:"löschen",ru:"удалять, стирать",h:"глагол"},
     {de:"hochladen",ru:"загружать (файл)",h:"глагол"},
     {de:"teilen",ru:"делиться",h:"глагол"},
     {de:"entwickeln",ru:"разрабатывать",h:"глагол"},
@@ -2635,7 +2627,6 @@ var CHAPTERS_A2 = [
   ]},
   {num:9, name:"Спорт и природа", words:[
     {de:"die Sportart",ru:"вид спорта",h:"сущ., ж.р."},
-    {de:"surfen",ru:"заниматься сёрфингом",h:"глагол"},
     {de:"tauchen",ru:"нырять с аквалангом",h:"глагол"},
     {de:"die Mannschaft",ru:"команда",h:"сущ., ж.р."},
     {de:"das Tor",ru:"ворота, гол",h:"сущ., ср.р."},
@@ -2668,7 +2659,6 @@ var CHAPTERS_A2 = [
     {de:"einziehen",ru:"въезжать, переезжать",h:"глагол"},
     {de:"der Mieter",ru:"арендатор, жилец",h:"сущ., м.р."},
     {de:"kündigen",ru:"расторгать договор",h:"глагол"},
-    {de:"der Briefkasten",ru:"почтовый ящик",h:"сущ., м.р."},
     {de:"der Bär",ru:"медведь",h:"сущ., м.р."},
     {de:"der Hase",ru:"заяц",h:"сущ., м.р."},
     {de:"das Schaf",ru:"овца",h:"сущ., ср.р."},
@@ -3148,6 +3138,7 @@ function renderQ(){
     document.getElementById('opts').style.display='none';
     document.getElementById('write-area').style.display='block';
     document.getElementById('write-input').placeholder='Partizip II…';
+    curW.speakText = w.part;
     setTimeout(function(){ document.getElementById('write-input').focus(); }, 100);
     setTimeout(function(){ safeSpeak(curW.de); }, 500);
   } else if(m==='past-mc'){
@@ -3345,7 +3336,7 @@ function unseenFirst(pool){
   return seen.slice().sort(function(a,b){ return conjErrs(b.de)-conjErrs(a.de)+(Math.random()-.5); });
 }
 function buildConjQuestions(mode, count){
-  count = count||15;
+  count = count||10;
   if(mode==='conj-word'){
     var pool = unseenFirst(CONJ_WORDS);
     return pool.slice(0,Math.min(count,pool.length)).map(function(w){ return {w:{de:w.de,ru:w.ru,globalIdx:null},m:'conj-word'}; });
@@ -3389,7 +3380,7 @@ function unseenFirstGender(){
   return seen.slice().sort(function(a,b){ return genderErrs(b.de)-genderErrs(a.de)+(Math.random()-.5); });
 }
 function buildGenderQuestions(mode, count){
-  count = count||15;
+  count = count||10;
   var pool = unseenFirstGender();
   var taken = pool.slice(0, Math.min(count, pool.length));
   function toQ(w, m){
@@ -3493,7 +3484,7 @@ function unseenFirstPast(){
   return seen.slice().sort(function(a,b){ return pastErrs(b.inf)-pastErrs(a.inf)+(Math.random()-.5); });
 }
 function buildPastQuestions(mode, count){
-  count=count||15;
+  count=count||10;
   var pool=unseenFirstPast();
   function makeW(v){ return {de:v.infFull, inf:v.inf, part:v.part, prat:v.prat, ru:v.ru, globalIdx:null}; }
   if(mode==='past-write'){
@@ -3742,7 +3733,7 @@ function errBadge(te,ta){
 
 function renderWList(f){
   var list=document.getElementById('wlist'); list.innerHTML='';
-  var rows=WORDS.slice().sort(function(a,b){
+  var rows=WORDS.concat(WORDS_A2).slice().sort(function(a,b){
     var ea=totalErrs(a.globalIdx), eb=totalErrs(b.globalIdx);
     return eb-ea;
   });
