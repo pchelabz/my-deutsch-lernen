@@ -2259,24 +2259,6 @@ var GENDER_PACKS = [
   });
 })();
 
-// Auto-generate A2 gender packs from CHAPTERS_A2 data (skip ch.13 — has manual pack num:30)
-(function(){
-  CHAPTERS_A2.forEach(function(ch){
-    if(ch.num === 13) return;
-    var nouns = ch.words.filter(function(w){
-      return w.h && w.h.indexOf('сущ.') >= 0 &&
-             w.h.indexOf('мн.ч.') < 0 &&
-             /^(die|der|das) /.test(w.de);
-    }).map(function(w){
-      var sp = w.de.indexOf(' ');
-      return {de: w.de.slice(sp+1), ru: w.ru, art: w.de.slice(0, sp)};
-    });
-    if(nouns.length > 0){
-      GENDER_PACKS.push({num: 30+ch.num, name: 'А2-Гл.'+ch.num+': '+ch.name, words: nouns});
-    }
-  });
-})();
-
 // ==================== PAST VERBS ====================
 var PAST_VERBS = [
   {inf:"bleiben",    infFull:"bleiben",            prat:"blieb",    part:"geblieben",   ru:"оставаться"},
@@ -2784,6 +2766,24 @@ CHAPTERS_A2.forEach(function(ch){
     WORDS_A2.push({de:w.de,ru:w.ru,h:w.h,chNum:ch.num,chName:ch.name,globalIdx:A2_OFFSET+WORDS_A2.length});
   });
 });
+
+// Auto-generate A2 gender packs from CHAPTERS_A2 data (skip ch.13 — has manual pack num:30)
+(function(){
+  CHAPTERS_A2.forEach(function(ch){
+    if(ch.num === 13) return;
+    var nouns = ch.words.filter(function(w){
+      return w.h && w.h.indexOf('сущ.') >= 0 &&
+             w.h.indexOf('мн.ч.') < 0 &&
+             /^(die|der|das) /.test(w.de);
+    }).map(function(w){
+      var sp = w.de.indexOf(' ');
+      return {de: w.de.slice(sp+1), ru: w.ru, art: w.de.slice(0, sp)};
+    });
+    if(nouns.length > 0){
+      GENDER_PACKS.push({num: 30+ch.num, name: 'А2-Гл.'+ch.num+': '+ch.name, words: nouns});
+    }
+  });
+})();
 
 // ==================== STATE ====================
 var curVocabSet = 'a1'; // 'a1' or 'a2'
